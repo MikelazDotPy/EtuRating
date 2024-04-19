@@ -1,6 +1,6 @@
 import { makeAutoObservable } from "mobx";
 
-import {FacultiesDATA} from "./dataStubs";
+import {FacultiesDATA, SPECIALITIES} from "./dataStubs";
 
 
 class FacultiesStore {
@@ -46,6 +46,10 @@ class FacultiesStore {
     changeFilter(filter) {
         this.specialitiesFilter = filter;
         console.log(this.specialitiesFilter)
+    }
+
+    async getSpecialityInfo(URL) {
+        return await SPECIALITIES.find(spec => spec.URL === URL)
     }
 
 }

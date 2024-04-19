@@ -35,7 +35,7 @@ export const Faculty = observer(({ faculty }) => {
                 <div className="flex flex-col">
                     {specialities.map(speciality => (
                         <SpecialityInList
-                            href={`/faculty?type=${faculty.title}/${speciality.title}`}
+                            href={`/faculties/specialities/${speciality.URL}`}
                             key={speciality.id}
                             className="ml-6 text-[14px]"
                         >
@@ -50,7 +50,6 @@ export const Faculty = observer(({ faculty }) => {
 
 const FacultyInList = styled.div`
     display: flex;
-    //flex-direction: column;
     margin-top: 12px;
 `;
 
