@@ -13,6 +13,7 @@ module.exports = {
       colors: {
         "overall-purple": "#7653FC",
         "overall-grey": "#dfdfdf",
+        "dark-grey": "#3B434E",
       },
       screens: {
         'mobile': '300px',

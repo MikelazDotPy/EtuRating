@@ -2,7 +2,6 @@ import { makeAutoObservable } from "mobx";
 
 import {FacultiesDATA, SPECIALITIES} from "./dataStubs";
 
-
 class FacultiesStore {
     selectedFacultyId = null;
     selectedSpeciality = null;

@@ -2,6 +2,7 @@
 
 import { FacultiesData } from "../../../../../stores/FacultiesStore";
 import { useEffect, useState } from "react";
+import SpecPage from "@/components/SpecPage/SpecPage";
 
 const SpecialityPage = () => {
     const [SpecInfo, setSpecInfo] = useState(null);
@@ -12,7 +13,6 @@ const SpecialityPage = () => {
             const result = await FacultiesData.getSpecialityInfo(URL[URL.length - 1]);
             setSpecInfo(result);
         };
-
         fetchData();
     }, []);
 
@@ -21,9 +21,9 @@ const SpecialityPage = () => {
     }
 
     return (
-        <>
-            {SpecInfo.title}
-        </>
+        <div className={"w-full"}>
+            <SpecPage data={SpecInfo}/>
+        </div>
     );
 };
 
