@@ -13,6 +13,7 @@ conn = Session()
 import sqlalchemy.orm
 Base = sqlalchemy.orm.declarative_base()
 metadata = db.MetaData()
+csv.field_size_limit(200000)
 
 class Priem(Base):
     __tablename__ = 'priem'
@@ -72,6 +73,11 @@ class EtuSubject(Base):
     diff_offset = Column(db.Boolean)
     course_work = Column(db.Boolean)
 
+class Summary(Base):
+    __tablename__ = 'summary'
+    id = Column(Integer, primary_key=True)
+    summary = Column(Text)
+    subject = Column(Text)
 
 def getSpecialties(fakultet_id: int, session):
     select_all_query = session.query(Special).filter(Special.fakultet_id == fakultet_id).all()
@@ -115,8 +121,11 @@ def get_edu_prog(plan_id: int, custom_conn):
     for subj in subjects:
         a = conn.query(EtuSubject).filter(EtuSubject.plan_str_id == subj.etu_id).all()
         for inf_subj in a:
+            summar = conn.query(Summary).filter(Summary.subject == subj.subject).all()
+            summar = 'None' if not summar else summar[0].summary
+            print('None' if not summar else summar[0].summary, subj.subject)
             semester[inf_subj.sem].append({"subject":subj.subject, "hours":inf_subj.hours,
-                                            "ze": inf_subj.ze, "summary":"lorem foo bar"})
+                                            "ze": inf_subj.ze, "summary":summar})
             if inf_subj.exam:
                 exams[inf_subj.sem].append(subj.subject)
             if inf_subj.offset:
@@ -133,7 +142,6 @@ def get_edu_prog(plan_id: int, custom_conn):
         "course_works": course_works
     }
     return d
-            
 
 if __name__ == '__main__':
     create = False
@@ -201,4 +209,14 @@ if __name__ == '__main__':
                                 hours = int(float(row[10])))
                 conn.add(ins)
         conn.commit()
+        with open('rpd.csv', 'r') as f:
+            rows = csv.reader(f)
+            next(rows)
+            for row in rows:
+                ins = Summary(summary = row[1], subject = row[2])
+                conn.add(ins)
+        conn.commit()
+
+    get_edu_prog(6797, conn)
+
     conn.close()
