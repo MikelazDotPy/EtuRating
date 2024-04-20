@@ -1,31 +1,42 @@
 import sqlalchemy as db
 from sqlalchemy import Table, Column, Integer, String, Text
 import csv
-engine = db.create_engine('sqlite:///uwu.db')
-conn = engine.connect()
+import json
+
+from sqlalchemy import Column, Integer, String
+from sqlalchemy import create_engine
+engine = create_engine('sqlite:///db/uwu.db', echo = True)
+from sqlalchemy.ext.declarative import declarative_base
+Base = declarative_base()
+
+class Special(Base):
+   __tablename__ = 'special'
+   
+   id = Column(Integer, primary_key = True)
+   plan_id = Column(Integer)
+   name = Column(String)
+   specialty_id = Column(Integer)
+   department_id = Column(Integer)
+   fakultet_id = Column(Integer)
+   study_period = Column(Integer)
+   study_form_id = Column(Integer)
+   study_level_id = Column(Integer)
 
 metadata = db.MetaData()
-#Title,SpecialtyId,DepartmentId,StudyFormId,StudyLevelId,StudyPeriod,FakultetID
-Special = Table('special', metadata,
+
+Vacancy = Table('vacancy', metadata,
                 Column('id', Integer, primary_key=True),
-                Column('plan_id', Integer),
-                Column('name', Text),
-                Column('specialty_id', Integer),
-                Column('department_id', Integer),
-                Column('fakultet_id', Integer),
-                Column('study_period', Integer),
-                Column('study_form_id', Integer),
-                Column('study_level_id', Integer))
+                Column('sphere', Text),
+                Column('skills', Text))
 
-
-def getSpecialties(fakultet_id: int):
-    select_all_query = db.select(Special).filter_by(fakultet_id=fakultet_id)
-    select_all_results = conn.execute(select_all_query)
-    return select_all_results.fetchall()
-
+def getSpecialties(fakultet_id: int, session):
+    select_all_query = session.query(Special).filter(Special.fakultet_id == fakultet_id).all()
+    return select_all_query
+    
 if __name__ == '__main__':
     metadata.create_all(engine)
     #Title,SpecialtyId,DepartmentId,StudyFormId,StudyLevelId,StudyPeriod,FakultetId
+    
     with open('destination 2 (2).csv', 'r') as f:
         rows = csv.reader(f, delimiter=',')
         ff = False
@@ -40,5 +51,12 @@ if __name__ == '__main__':
                 conn.execute(insertion)
             
             ff = True
+    
+    with open('результат.txt', 'r') as f:
+        jj = json.load(f)
+    
+    for k in jj:
+        insertion = Vacancy.insert().values(sphere=k, skills=str(jj[k])[1:-1].replace("'","").replace(", ", ","))
+        conn.execute(insertion)
 
     conn.commit()
