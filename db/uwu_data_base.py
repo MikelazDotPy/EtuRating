@@ -3,29 +3,36 @@ from sqlalchemy import Table, Column, Integer, String, Text
 import csv
 import json
 
+from sqlalchemy import Column, Integer, String
+from sqlalchemy import create_engine
+engine = create_engine('sqlite:///db/uwu.db', echo = True)
+from sqlalchemy.ext.declarative import declarative_base
+Base = declarative_base()
+
+class Special(Base):
+   __tablename__ = 'special'
+   
+   id = Column(Integer, primary_key = True)
+   plan_id = Column(Integer)
+   name = Column(String)
+   specialty_id = Column(Integer)
+   department_id = Column(Integer)
+   fakultet_id = Column(Integer)
+   study_period = Column(Integer)
+   study_form_id = Column(Integer)
+   study_level_id = Column(Integer)
+
 metadata = db.MetaData()
-#Title,SpecialtyId,DepartmentId,StudyFormId,StudyLevelId,StudyPeriod,FakultetID
-Special = Table('special', metadata,
-                Column('id', Integer, primary_key=True),
-                Column('plan_id', Integer),
-                Column('name', Text),
-                Column('specialty_id', Integer),
-                Column('department_id', Integer),
-                Column('fakultet_id', Integer),
-                Column('study_period', Integer),
-                Column('study_form_id', Integer),
-                Column('study_level_id', Integer))
 
 Vacancy = Table('vacancy', metadata,
                 Column('id', Integer, primary_key=True),
                 Column('sphere', Text),
                 Column('skills', Text))
 
-
 def getSpecialties(fakultet_id: int, session):
-    select_all_query = session.query(Special).filter(Special.id>2).all()
+    select_all_query = session.query(Special).filter(Special.fakultet_id == fakultet_id).all()
     return select_all_query
-
+    
 if __name__ == '__main__':
     metadata.create_all(engine)
     #Title,SpecialtyId,DepartmentId,StudyFormId,StudyLevelId,StudyPeriod,FakultetId
