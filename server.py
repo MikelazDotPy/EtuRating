@@ -75,7 +75,7 @@ class UwURequestHandler(SimpleHTTPRequestHandler):
             j = json.loads(self.post_body)
             # print(j)
             if all(map(lambda x: x["type"] != None and x["points"] != None, j)):
-                data = list(map(lambda x: { "type": x["type"], "value": x["points"] }, j))
+                data = list(map(lambda x: { "type": x["type"], "value": int(x["points"]) }, j))
                 additional = 0
                 data = translateEGE(data)
                 l = findEGE(session, data, additional)
