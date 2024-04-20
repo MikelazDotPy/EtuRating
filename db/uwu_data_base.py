@@ -2,7 +2,7 @@ import sqlalchemy as db
 from sqlalchemy import Table, Column, Integer, String, Text
 import csv
 import json
-engine = db.create_engine('sqlite:///uwu.db')
+engine = db.create_engine('sqlite:///db/uwu.db')
 conn = engine.connect()
 
 metadata = db.MetaData()
@@ -28,8 +28,9 @@ def getSpecialties(fakultet_id: int):
     custom_conn = engine.connect()
     select_all_query = db.select(Special).filter_by(fakultet_id=fakultet_id)
     select_all_results = custom_conn.execute(select_all_query)
-    custom_conn.close()
-    return select_all_results.fetchall()
+    ans = select_all_results.fetchall()
+    custom_conn.close
+    return ans
 
 if __name__ == '__main__':
     metadata.create_all(engine)
