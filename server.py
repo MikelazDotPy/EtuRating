@@ -59,22 +59,15 @@ class UwURequestHandler(SimpleHTTPRequestHandler):
     def sendData(self, data):
         self.sendText(json.dumps(data).encode())
 
-    def doEGE(self, cmds, args):
-        content_len = int(self.headers.get('Content-Length'))
-        post_body = self.rfile.read(content_len)
-        print('!!!!!!!!!!', post_body)
-        self.doSpecialty(cmds, args)
-
     def doSpecialty(self, cmds, args):
         sp = uwudb.getSpecialties(int(cmds[1]), session)
-        self.sendData(list(map(lambda x: { "id": x.id, "plan_id": x.plan_id, "name": x.name, "specialty_id": x.specialty_id, "department_id": x.department_id, "department": departments[x.department_id][1],"faculty_id": x.fakultet_id, "faculty": faculties_dict[x.fakultet_id]["title"], "study_period": x.study_period, "type": study_form[x.study_form_id], "study_level_id": x.study_level_id }, sp)))
-        '''
-        self.sendData(list(map(lambda x:
-          { "title": x[0], "id": x[1], "department": departments[x[2]][1], "study_form": study_form[x[3]] }  
-        , sp)))
-        '''
+        if 'ege1' in args[1].keys():
+            print(args[1])
+            self.sendData(args[1])
+        else:
+            self.sendData(list(map(lambda x: { "id": x.id, "plan_id": x.plan_id, "name": x.name, "specialty_id": x.specialty_id, "department_id": x.department_id, "department": departments[x.department_id][1],"faculty_id": x.fakultet_id, "faculty": faculties_dict[x.fakultet_id]["title"], "study_period": x.study_period, "type": study_form[x.study_form_id], "study_level_id": x.study_level_id }, sp)))
 
-    def doAPI(self, is_post: bool):
+    def doAPI(self):
         cmd = self.path.split('/')[2:]
         arglist = list(map(lambda x: list(map(lambda y: (y[:y.find('=')], y[y.find('=') + 1:]), x[x.find('?'):][1:].split('&'))), cmd))
 
@@ -100,25 +93,15 @@ class UwURequestHandler(SimpleHTTPRequestHandler):
         elif (len(cmds) == 1 and cmds[0] == "ege"):
             self.doEGE(cmds, args)
         elif (len(cmds) == 2 and cmds[0] == "faculties"):
-            if is_post:
-                self.doEGE(cmds, args)
-            else:
-                self.doSpecialty(cmds, args)
+            self.doSpecialty(cmds, args)
         else:
             self.sendData({ "message": "ECHO", "cmds": cmds, "args": args })
             
     def do_GET(self):
         if (self.path.find('/api/') == 0):
-            self.doAPI(False)
-        else:
-            super().do_GET()
-    
-    def do_POST(self):
-        if (self.path.find('/api/') == 0):
             self.doAPI()
         else:
-            super().do_POST(True)
-                
+            super().do_GET()           
 
 if __name__ == '__main__':    
     os.chdir(os.path.dirname(__file__) + "/root/")

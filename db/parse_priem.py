@@ -22,4 +22,9 @@ def addPriem(conn, engine, filename):
     return r
 
 if __name__ == "__main__":
-    print(addPriem(conn, engine, "priem.json"))
+    engine = create_engine('sqlite:///db/uwu.db', echo=True)
+    Session = sessionmaker(bind=engine)
+    conn = Session()
+
+    a = addPriem(conn, engine, "priem.json")
+    print('\n'.join(list(map(lambda x: f'<({x.id}) ({x.name}) ({x.ege1}) ({x.ege2}) ({x.ege3}) ({x.min1}) ({x.min2}) ({x.min3}) ({x.last_year})>', a))))
