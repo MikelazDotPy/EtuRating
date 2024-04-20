@@ -75,13 +75,16 @@ class UwURequestHandler(SimpleHTTPRequestHandler):
             j = json.loads(self.post_body)
             # print(j)
             if all(map(lambda x: x["type"] != None and x["points"] != None, j)):
-                data = list(map(lambda x: { "type": x["type"], "value": int(x["points"]) }, j))
+                data = list(map(lambda x: { "type": x["type"], "value": x["points"] }, j))
                 additional = 0
+                data = translateEGE(data)
                 l = findEGE(session, data, additional)
-                sp = getSpecialtiesFromIDs(session, l)
+                sp = list(filter(lambda x: x.fakultet_id == int(cmds[1]), getSpecialtiesFromIDs(session, l)))
             else:
                 sp = uwudb.getSpecialties(int(cmds[1]), session)
         else:
+            print("!!! EXPECTED POST")
+        """
             if args[1]['points1'] != 'null' and args[1]['points2'] != 'null' and args[1]['points3'] != 'null' and args[1]['ege1'] != 'null' and args[1]['ege2'] != 'null' and args[1]['ege3'] != 'null':
                 data = [ { "type": args[1]["ege1"], "value": int(args[1]["points1"]) }, { "type": args[1]["ege2"], "value": int(args[1]["points2"]) }, { "type": args[1]["ege3"], "value": int(args[1]["points3"]) } ]
                 additional = args[1]['additional'] if ('additional' in args[1].keys()) else 0
@@ -90,6 +93,7 @@ class UwURequestHandler(SimpleHTTPRequestHandler):
                 sp = getSpecialtiesFromIDs(session, l)
             else:
                 sp = uwudb.getSpecialties(int(cmds[1]), session)
+        """
         print(sp)
         self.sendData(list(map(lambda x: { "id": x.id, "plan_id": x.plan_id, "name": x.name, "specialty_id": x.specialty_id, "department_id": x.department_id, "department": departments[x.department_id][1],"faculty_id": x.fakultet_id, "faculty": faculties_dict[x.fakultet_id]["title"], "study_period": x.study_period, "type": study_form[x.study_form_id], "study_level_id": x.study_level_id }, sp)))
 
