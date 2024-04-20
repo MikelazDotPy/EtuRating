@@ -1,6 +1,7 @@
 import sqlalchemy as db
 from sqlalchemy import Table, Column, Integer, String, Text
 import csv
+import json
 engine = db.create_engine('sqlite:///uwu.db')
 conn = engine.connect()
 
@@ -17,6 +18,11 @@ Special = Table('special', metadata,
                 Column('study_form_id', Integer),
                 Column('study_level_id', Integer))
 
+Vacancy = Table('vacancy', metadata,
+                Column('id', Integer, primary_key=True),
+                Column('sphere', Text),
+                Column('skills', Text))
+
 
 def getSpecialties(fakultet_id: int):
     select_all_query = db.select(Special).filter_by(fakultet_id=fakultet_id)
@@ -26,6 +32,7 @@ def getSpecialties(fakultet_id: int):
 if __name__ == '__main__':
     metadata.create_all(engine)
     #Title,SpecialtyId,DepartmentId,StudyFormId,StudyLevelId,StudyPeriod,FakultetId
+    
     with open('destination 2 (2).csv', 'r') as f:
         rows = csv.reader(f, delimiter=',')
         ff = False
@@ -40,5 +47,12 @@ if __name__ == '__main__':
                 conn.execute(insertion)
             
             ff = True
+    
+    with open('результат.txt', 'r') as f:
+        jj = json.load(f)
+    
+    for k in jj:
+        insertion = Vacancy.insert().values(sphere=k, skills=str(jj[k])[1:-1].replace("'","").replace(", ", ","))
+        conn.execute(insertion)
 
     conn.commit()
