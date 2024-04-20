@@ -1,0 +1,19 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans&display=swap');
+
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+    font-family: 'Noto Sans', sans-serif;
+    background: #fafafa;
+}
+
+.container {
+    margin: 0 22px;
+}
+
+*, input {
+    border: none;
+}
