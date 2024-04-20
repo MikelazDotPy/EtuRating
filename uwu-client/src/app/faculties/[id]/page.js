@@ -3,30 +3,37 @@
 import { useEffect, useState } from 'react';
 import { FacultiesData } from "../../../../stores/FacultiesStore";
 import SpecList from "@/components/specialitiesList/SpecialitesList";
+import { useRouter } from 'next/navigation';
+import {observer} from "mobx-react";
 
-const Page = () => {
-    const [url, setUrl] = useState('');
+
+const Page = observer(() => {
     const [facultyData, setFacultyData] = useState(null);
 
+    const URL = window.location.href.split("/")
+    const URL_ID = URL[URL.length - 1]
+
     useEffect(() => {
-        setUrl(window.location.href);
-        const FacultyType = url[url.length - 1];
-        FacultiesData.fetchFacultiesData(FacultyType)
-            .then(data => {
-                setFacultyData(data)
-                console.log(data.specialities)
-            });
-    }, [url]);
+        const getData = async () => {
+            console.log(URL_ID, FacultiesData.examPoints)
+            const data = await FacultiesData.fetchFacultiesData(URL_ID, FacultiesData.examPoints)
+            console.log(data)
+            console.log(facultyData)
+            setFacultyData(data)
+        }
+        getData()
+    }, [URL_ID]);
 
     return (
         <div className="mt-10">
+
             <div className="flex space-x-5 items-center">
                 <div className={"text-[26px]"}>СПБГЭТУ "ЛЭТИ"</div>
-                {facultyData && <h3 className={"text-[22px]"}>{facultyData.facultyTitle}</h3>}
+                {facultyData && <h3 className={"text-[22px]"}>{facultyData.name}</h3>}
             </div>
-            {facultyData && <SpecList specialitiesData={facultyData.specialities}/>}
+            {facultyData && <SpecList specialitiesData={facultyData}/>}
         </div>
     );
-}
+})
 
 export default Page;

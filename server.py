@@ -48,6 +48,13 @@ study_form = {
 }
 
 class UwURequestHandler(SimpleHTTPRequestHandler):
+    def do_OPTIONS(self):
+        self.send_response(200)
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+        self.end_headers()
+
     def sendText(self, text):
         self.send_response(200)
         self.send_header('Content-type',  'application/json')
@@ -62,13 +69,18 @@ class UwURequestHandler(SimpleHTTPRequestHandler):
         self.sendText(json.dumps(data).encode())
 
     def doSpecialty(self, cmds, args, is_post):
+        print(self.post_body)
         sp = []
         if is_post:
             j = json.loads(self.post_body)
-            data = list(map(lambda x: { "type": x["type"], "value": x["points"] }, j))
-            additional = 0
-            l = findEGE(session, data, additional)
-            sp = getSpecialtiesFromIDs(session, l)
+            # print(j)
+            if all(map(lambda x: x["type"] != None and x["points"] != None, j)):
+                data = list(map(lambda x: { "type": x["type"], "value": int(x["points"]) }, j))
+                additional = 0
+                l = findEGE(session, data, additional)
+                sp = getSpecialtiesFromIDs(session, l)
+            else:
+                sp = uwudb.getSpecialties(int(cmds[1]), session)
         else:
             if args[1]['points1'] != 'null' and args[1]['points2'] != 'null' and args[1]['points3'] != 'null' and args[1]['ege1'] != 'null' and args[1]['ege2'] != 'null' and args[1]['ege3'] != 'null':
                 data = [ { "type": args[1]["ege1"], "value": int(args[1]["points1"]) }, { "type": args[1]["ege2"], "value": int(args[1]["points2"]) }, { "type": args[1]["ege3"], "value": int(args[1]["points3"]) } ]
@@ -78,6 +90,7 @@ class UwURequestHandler(SimpleHTTPRequestHandler):
                 sp = getSpecialtiesFromIDs(session, l)
             else:
                 sp = uwudb.getSpecialties(int(cmds[1]), session)
+        print(sp)
         self.sendData(list(map(lambda x: { "id": x.id, "plan_id": x.plan_id, "name": x.name, "specialty_id": x.specialty_id, "department_id": x.department_id, "department": departments[x.department_id][1],"faculty_id": x.fakultet_id, "faculty": faculties_dict[x.fakultet_id]["title"], "study_period": x.study_period, "type": study_form[x.study_form_id], "study_level_id": x.study_level_id }, sp)))
 
     def doEduProgram(self, cmds, args):

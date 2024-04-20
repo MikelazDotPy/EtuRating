@@ -2,8 +2,16 @@ import { makeAutoObservable } from "mobx";
 import axios from "axios";
 
 import {FacultiesDATA, SPECIALITIES} from "./dataStubs";
+import {faCalculator} from "@fortawesome/free-solid-svg-icons";
+const qs= require("qs")
 
 const URL = "http://localhost:8000/api/faculties";
+
+// Создаем соответствие между русскими и английскими названиями предметов
+
+// Функция для получения английского названия предмета
+
+// Используем функцию для получения английского названия предмета
 
 class FacultiesStore {
     selectedFacultyId = null;
@@ -17,12 +25,12 @@ class FacultiesStore {
 
     constructor() {
         makeAutoObservable(this);
+        // this.loadStateFromStorage();
     }
 
     async getMainPageInfo() {
         try {
             const response = await axios.get(URL);
-            console.log(response)
             this.mainPageInfo = response.data;
             return this.mainPageInfo;
         } catch (error) {
@@ -57,18 +65,29 @@ class FacultiesStore {
     }
 
     getSearchData(){
-        console.log(this.searchText)
         this.searchText = null;
     }
 
-    async fetchFacultiesData(id) {
-        this.facultyData = await FacultiesDATA;
+    async fetchFacultiesData(id, body) {
+        if (body) {
+            try {
+                const res = await axios.post(URL + `/${id}`, body)
+                this.facultyData = res.data;
+                console.log(res)
+                return this.facultyData;
+            } catch (error) {
+                console.error('Ошибка при отправке данных: ', error);
+                throw error;
+            }
+        }
+        const res = await axios.get(URL + `/${id}`)
+        this.facultyData = res.data;
         return this.facultyData;
     }
 
+
     changeFilter(filter) {
         this.specialitiesFilter = filter;
-        console.log(this.specialitiesFilter)
     }
 
     async getSpecialityInfo(URL) {
@@ -77,28 +96,32 @@ class FacultiesStore {
 
     changeExamPoints = (id, amount) => {
         this.examPoints[id-1].points = amount
-        console.log(amount)
     }
 
     changeExamType = (id, type) => {
-        this.examPoints[id-1].type = type
-        console.log(type)
+        this.examPoints[id-1].type = type.not_russian
+    }
+
+    getEnglishName(russianName) {
+        const discipline = DispciplinesExams.find(d => d.russian === russianName);
+        return discipline ? discipline.not_russian : null;
     }
 
 }
 
 export const FacultiesData = new FacultiesStore();
 
+
 export const DispciplinesExams = [
-    "Русский язык",
-    "Математика",
-    "Литература",
-    "География",
-    "Информатика",
-    "Физика",
-    "История",
-    "Биология",
-    "Химия",
-    "Обществознание",
-    "Иностранный язык"
+    {russian: "Русский язык", not_russian: "russian"},
+    {russian: "Математика", not_russian: "maths"},
+    {russian: "Литература", not_russian: "literatura"},
+    {russian: "География", not_russian: "geography"},
+    {russian: "Информатика", not_russian: "informatics"},
+    {russian: "Физика", not_russian: "physics"},
+    {russian: "История", not_russian: "history"},
+    {russian: "Биология", not_russian: "biology"},
+    {russian: "Химия", not_russian: "breaking_bad"},
+    {russian: "Обществознание", not_russian: "society"},
+    {russian: "Иностранный язык", not_russian: "english"},
 ]

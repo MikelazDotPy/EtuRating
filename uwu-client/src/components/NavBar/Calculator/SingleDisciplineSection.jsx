@@ -3,14 +3,16 @@
 import React, { useState, useEffect } from 'react';
 import { Dropdown } from 'rsuite';
 import { DispciplinesExams, FacultiesData } from "../../../../stores/FacultiesStore";
+import {observer} from "mobx-react";
 
-const SingleDisciplineSection = ({ id }) => {
+const SingleDisciplineSection = ({id}) => {
     const [titleString, setTitleString] = useState("Предмет");
     const [examPoints, setExamPoints] = useState(null);
 
     const changePoints = (e) => {
-        setExamPoints(e.target.value)
-        FacultiesData.changeExamType(id, titleString);
+        const newPoints = e.target.value;
+        setExamPoints(newPoints);
+        FacultiesData.changeExamPoints(id, newPoints);
     };
 
     return (
@@ -19,27 +21,26 @@ const SingleDisciplineSection = ({ id }) => {
                 {DispciplinesExams.map(exam => (
                     <Dropdown.Item
                         key={exam}
-                        className="text-gray-600 ml-4 mt-[6px] cursor-pointer"
+                        className="text-gray-600 ml-4 mt-[8px] cursor-pointer w-full h-8"
                         onClick={() => {
-                            setTitleString(exam);
-                            console.log(exam)
-                            console.log(examPoints)
+                            setTitleString(exam.russian);
                             FacultiesData.changeExamType(id, exam);
                         }}
                     >
-                        {exam}
+                        {exam.russian}
                     </Dropdown.Item>
                 ))}
             </Dropdown>
             <input
                 type="text"
                 value={examPoints}
-                className="outline-none mt-2"
+                className="pl-2 outline-none mt-2 w-full h-10"
                 onChange={changePoints}
                 placeholder={"Баллы"}
             />
         </div>
-    );
-};
+    )
+}
+
 
 export default SingleDisciplineSection;
