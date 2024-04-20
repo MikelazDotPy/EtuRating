@@ -65,7 +65,10 @@ class UwURequestHandler(SimpleHTTPRequestHandler):
         sp = []
         if is_post:
             j = json.loads(self.post_body)
-            print('!!!! AAAAAA', j)
+            data = list(map(lambda x: { "type": x["type"], "value": x["points"] }, j))
+            additional = 0
+            l = findEGE(session, data, additional)
+            sp = getSpecialtiesFromIDs(session, l)
         else:
             if args[1]['points1'] != 'null' and args[1]['points2'] != 'null' and args[1]['points3'] != 'null' and args[1]['ege1'] != 'null' and args[1]['ege2'] != 'null' and args[1]['ege3'] != 'null':
                 data = [ { "type": args[1]["ege1"], "value": int(args[1]["points1"]) }, { "type": args[1]["ege2"], "value": int(args[1]["points2"]) }, { "type": args[1]["ege3"], "value": int(args[1]["points3"]) } ]
