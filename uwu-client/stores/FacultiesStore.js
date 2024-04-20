@@ -3,7 +3,7 @@ import axios from "axios";
 
 import {FacultiesDATA, SPECIALITIES} from "./dataStubs";
 
-const URL = "https://literally-bright-kitten.ngrok-free.app/api/faculties"
+const URL = "http://localhost:8000/api/faculties";
 
 class FacultiesStore {
     selectedFacultyId = null;
@@ -13,6 +13,7 @@ class FacultiesStore {
     facultyData = null;
     specialitiesFilter = null;
     mainPageInfo = null;
+    examPoints = [{type: null, points: null}, {type: null, points: null}, {type: null, points: null}]
 
     constructor() {
         makeAutoObservable(this);
@@ -20,11 +21,7 @@ class FacultiesStore {
 
     async getMainPageInfo() {
         try {
-            // const response = await axios.get("https://e72b-92-255-89-234.ngrok-free.app/api/faculties");
-            const response = await fetch(URL,
-                {method: "GET", mode: "no-cors",
-                    headers: {"Content-Type": "application/json",
-                    "ngrok-skip-browser-warning": "true"}})
+            const response = await axios.get(URL);
             console.log(response)
             this.mainPageInfo = response.data;
             return this.mainPageInfo;
@@ -78,6 +75,30 @@ class FacultiesStore {
         return await SPECIALITIES.find(spec => spec.URL === URL)
     }
 
+    changeExamPoints = (id, amount) => {
+        this.examPoints[id-1].points = amount
+        console.log(amount)
+    }
+
+    changeExamType = (id, type) => {
+        this.examPoints[id-1].type = type
+        console.log(type)
+    }
+
 }
 
 export const FacultiesData = new FacultiesStore();
+
+export const DispciplinesExams = [
+    "Русский язык",
+    "Математика",
+    "Литература",
+    "География",
+    "Информатика",
+    "Физика",
+    "История",
+    "Биология",
+    "Химия",
+    "Обществознание",
+    "Иностранный язык"
+]
