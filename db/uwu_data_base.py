@@ -7,7 +7,7 @@ import json
 from sqlalchemy import Column, Integer, String
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-engine = create_engine('sqlite:///uwu.db', echo=False)
+engine = create_engine('sqlite:///db/uwu.db', echo=False)
 Session = sessionmaker(bind=engine)
 conn = Session()
 import sqlalchemy.orm
@@ -123,7 +123,6 @@ def get_edu_prog(plan_id: int, custom_conn):
         for inf_subj in a:
             summar = conn.query(Summary).filter(Summary.subject == subj.subject).all()
             summar = 'None' if not summar else summar[0].summary
-            print('None' if not summar else summar[0].summary, subj.subject)
             semester[inf_subj.sem].append({"subject":subj.subject, "hours":inf_subj.hours,
                                             "ze": inf_subj.ze, "summary":summar})
             if inf_subj.exam:

@@ -6,7 +6,9 @@ import requests
 from db import uwu_data_base as uwudb
 from sqlalchemy.orm import sessionmaker
 
-engine = sqlalchemy.create_engine('sqlite:///db/uwu.db', echo=True)
+from db.find_ege import *
+
+engine = sqlalchemy.create_engine('sqlite:///db/uwu.db', echo=False)
 Session = sessionmaker(bind=engine)
 session = Session()
 
@@ -59,15 +61,28 @@ class UwURequestHandler(SimpleHTTPRequestHandler):
     def sendData(self, data):
         self.sendText(json.dumps(data).encode())
 
-    def doSpecialty(self, cmds, args):
-        sp = uwudb.getSpecialties(int(cmds[1]), session)
-        if 'ege1' in args[1].keys():
-            print(args[1])
-            self.sendData(args[1])
+    def doSpecialty(self, cmds, args, is_post):
+        sp = []
+        if is_post:
+            j = json.loads(self.post_body)
+            print('!!!! AAAAAA', j)
         else:
-            self.sendData(list(map(lambda x: { "id": x.id, "plan_id": x.plan_id, "name": x.name, "specialty_id": x.specialty_id, "department_id": x.department_id, "department": departments[x.department_id][1],"faculty_id": x.fakultet_id, "faculty": faculties_dict[x.fakultet_id]["title"], "study_period": x.study_period, "type": study_form[x.study_form_id], "study_level_id": x.study_level_id }, sp)))
+            if args[1]['points1'] != 'null' and args[1]['points2'] != 'null' and args[1]['points3'] != 'null' and args[1]['ege1'] != 'null' and args[1]['ege2'] != 'null' and args[1]['ege3'] != 'null':
+                data = [ { "type": args[1]["ege1"], "value": int(args[1]["points1"]) }, { "type": args[1]["ege2"], "value": int(args[1]["points2"]) }, { "type": args[1]["ege3"], "value": int(args[1]["points3"]) } ]
+                additional = args[1]['additional'] if ('additional' in args[1].keys()) else 0
+                data = translateEGE(data)
+                l = findEGE(session, data, additional)
+                sp = getSpecialtiesFromIDs(session, l)
+            else:
+                sp = uwudb.getSpecialties(int(cmds[1]), session)
+        self.sendData(list(map(lambda x: { "id": x.id, "plan_id": x.plan_id, "name": x.name, "specialty_id": x.specialty_id, "department_id": x.department_id, "department": departments[x.department_id][1],"faculty_id": x.fakultet_id, "faculty": faculties_dict[x.fakultet_id]["title"], "study_period": x.study_period, "type": study_form[x.study_form_id], "study_level_id": x.study_level_id }, sp)))
 
-    def doAPI(self):
+    def doEduProgram(self, cmds, args):
+        d = uwudb.get_edu_prog(args[0]["id"], session)
+        print(d)
+        self.sendData(d)
+
+    def parseData(self):
         cmd = self.path.split('/')[2:]
         arglist = list(map(lambda x: list(map(lambda y: (y[:y.find('=')], y[y.find('=') + 1:]), x[x.find('?'):][1:].split('&'))), cmd))
 
@@ -85,15 +100,17 @@ class UwURequestHandler(SimpleHTTPRequestHandler):
                 cmds.append(x)
             else:
                 cmds.append(x[:x.find('?')])
+        return cmds, args
 
-        print(cmds, args)
+    def doAPI(self, is_post = False):
+        cmds, args = self.parseData()
 
         if (len(cmds) == 1 and cmds[0] == "faculties"):
             self.sendData(faculties)
-        elif (len(cmds) == 1 and cmds[0] == "ege"):
-            self.doEGE(cmds, args)
         elif (len(cmds) == 2 and cmds[0] == "faculties"):
-            self.doSpecialty(cmds, args)
+            self.doSpecialty(cmds, args, is_post)
+        elif (len(cmds) == 1 and cmds[0] == "edu_prog"):
+            self.doEduProgram(cmds, args)
         else:
             self.sendData({ "message": "ECHO", "cmds": cmds, "args": args })
             
@@ -101,7 +118,17 @@ class UwURequestHandler(SimpleHTTPRequestHandler):
         if (self.path.find('/api/') == 0):
             self.doAPI()
         else:
-            super().do_GET()           
+            super().do_GET() 
+
+    def do_POST(self):
+        cmds, args = self.parseData()
+
+        self.content_len = int(self.headers.get('Content-Length'))
+        self.post_body = self.rfile.read(self.content_len).decode()
+        self.doAPI(True)
+        self.content_len = None
+        self.post_body = None
+
 
 if __name__ == '__main__':    
     os.chdir(os.path.dirname(__file__) + "/root/")
