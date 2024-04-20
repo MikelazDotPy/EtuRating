@@ -56,7 +56,7 @@ const FacultyInList = styled.div`
 const SpecialityInList = styled.a`
     margin-top: 10px;
 
-    animation: fadein 1000ms ease-in-out forwards;
+    //animation: fadein 1000ms ease-in-out forwards;
 
     @keyframes fadein {
         from { opacity: 0.7; }

@@ -69,6 +69,34 @@ export const SPECIALITIES = [
                     "hours": "54",
                     "description": "lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit ametlorem ipsum dolor sit ametlorem ipsum dolor sit ametlorem ipsum dolor sit amet"
                 }]
+        }, {
+            "title": "Первый семестр",
+            "disciplines": [{
+                "title": "Алгебра и геометрия",
+                "creditUnit": "5",
+                "hours": "54",
+                "description": "lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit ametlorem ipsum dolor sit ametlorem ipsum dolor sit ametlorem ipsum dolor sit amet"
+            },
+                {
+                    "title": "Алгебра и геометрия",
+                    "creditUnit": "5",
+                    "hours": "54",
+                    "description": "lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit ametlorem ipsum dolor sit ametlorem ipsum dolor sit ametlorem ipsum dolor sit amet"
+                }]
+        }, {
+            "title": "Первый семестр",
+            "disciplines": [{
+                "title": "Алгебра и геометрия",
+                "creditUnit": "5",
+                "hours": "54",
+                "description": "lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit ametlorem ipsum dolor sit ametlorem ipsum dolor sit ametlorem ipsum dolor sit amet"
+            },
+                {
+                    "title": "Алгебра и геометрия",
+                    "creditUnit": "5",
+                    "hours": "54",
+                    "description": "lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit ametlorem ipsum dolor sit ametlorem ipsum dolor sit ametlorem ipsum dolor sit amet"
+                }]
         }]
     },
 ]

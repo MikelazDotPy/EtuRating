@@ -1,4 +1,5 @@
 import { makeAutoObservable } from "mobx";
+import axios from "axios";
 
 import {FacultiesDATA, SPECIALITIES} from "./dataStubs";
 
@@ -9,9 +10,28 @@ class FacultiesStore {
     searchText = null;
     facultyData = null;
     specialitiesFilter = null;
+    mainPageInfo = null;
 
     constructor() {
         makeAutoObservable(this);
+    }
+
+    async getMainPageInfo() {
+        try {
+            const response = await axios.get("http://25.17.147.15:8000/api/faculties");
+            this.mainPageInfo = response.data;
+            return this.mainPageInfo;
+        } catch (error) {
+            if (error.response) {
+                console.error('Ошибка при получении данных: ', error.response.data);
+                console.error('Статус ошибки: ', error.response.status);
+            } else if (error.request) {
+                console.error('Ошибка сети: ', error.request);
+            } else {
+                console.error('Ошибка при настройке запроса: ', error.message);
+            }
+            throw error;
+        }
     }
 
     changeActiveFaculty(faculty) {

@@ -1,16 +1,21 @@
-import React, { useState } from 'react';
-import {Faculty} from "@/components/NavBar/NavBarFaculty";
-
-const stub = [
-    {id: 1, title: "ФКТИ", specialities: [{id: 3344, title: 'Программная инженерия', URL: "programming_engineering"}, {id: 3381, title: "Приматы", URL: "pmi"}]},
-    {id: 2, title: "ФИБС", specialities: [{id: 1234, title: "Говнари"}]},
-    {id: 3, title: "ФЭА"},
-];
+import React, { useEffect, useState } from 'react';
+import { Faculty } from "@/components/NavBar/NavBarFaculty";
+import { FacultiesData } from "../../../stores/FacultiesStore";
 
 const FacultiesList = React.memo(() => {
+    const [navBarData, setNavBarData] = useState(null);
+
+    useEffect(() => {
+        const getData = async () => {
+            const data = await FacultiesData.getMainPageInfo();
+            setNavBarData(data);
+        }
+        getData();
+    }, []);
+
     return (
         <>
-            {stub.map(faculty => (
+            {navBarData && navBarData.map(faculty => (
                 <Faculty
                     key={faculty.id}
                     faculty={faculty}
