@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Faculty } from "@/components/NavBar/NavBarFaculty";
-import { FacultiesData } from "../../../stores/FacultiesStore";
+import { Faculty } from "@/components/NavBar/Faculties/NavBarFaculty";
+import { FacultiesData } from "../../../../stores/FacultiesStore";
 
 const FacultiesList = React.memo(() => {
     const [navBarData, setNavBarData] = useState(null);
@@ -8,6 +8,7 @@ const FacultiesList = React.memo(() => {
     useEffect(() => {
         const getData = async () => {
             const data = await FacultiesData.getMainPageInfo();
+            // console.log(data)
             setNavBarData(data);
         }
         getData();

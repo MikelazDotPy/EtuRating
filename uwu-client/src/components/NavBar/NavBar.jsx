@@ -3,12 +3,10 @@
 import React from "react";
 import Image from "next/image";
 
-import FacultiesSVG from "../../../public/graduation-hat 1.svg"
-import FacultiesList from "@/components/NavBar/FacultiesList";
 import Search from "@/components/NavBar/Search";
 import UwuLogo from "../../../public/UwuLogo.png"
-import FacultetsSection from "@/components/NavBar/FacultetsSection";
-import CalculatorSection from "@/components/NavBar/CalculatorSection";
+import FacultetsSection from "@/components/NavBar/Faculties/FacultetsSection";
+import CalculatorSection from "@/components/NavBar/Calculator/CalculatorSection";
 
 const NavBar = React.memo(() => {
     return (

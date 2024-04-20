@@ -1,8 +1,8 @@
 "use client"
 
 import Image from "next/image";
-import FacultiesSVG from "../../../public/graduation-hat 1.svg";
-import FacultiesList from "@/components/NavBar/FacultiesList";
+import FacultiesSVG from "../../../../public/graduation-hat 1.svg";
+import FacultiesList from "@/components/NavBar/Faculties/FacultiesList";
 import React from "react";
 
 const FacultetsSection = () => {

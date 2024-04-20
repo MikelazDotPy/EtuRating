@@ -3,7 +3,7 @@ import { observer } from "mobx-react";
 import styled from "styled-components";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
-import { FacultiesData } from "../../../stores/FacultiesStore";
+import { FacultiesData } from "../../../../stores/FacultiesStore";
 import {faArrowRight} from "@fortawesome/free-solid-svg-icons/faArrowRight";
 import Link from "next/link";
 

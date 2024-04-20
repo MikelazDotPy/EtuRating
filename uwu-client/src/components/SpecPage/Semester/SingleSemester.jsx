@@ -5,8 +5,6 @@ import {useState} from "react";
 
 const SingleSemester = ({data}) => {
 
-    console.log(data)
-
     const [isShown, setIsShown] = useState(false);
 
     return (

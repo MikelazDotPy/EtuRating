@@ -3,6 +3,8 @@ import axios from "axios";
 
 import {FacultiesDATA, SPECIALITIES} from "./dataStubs";
 
+const URL = "https://literally-bright-kitten.ngrok-free.app/api/faculties"
+
 class FacultiesStore {
     selectedFacultyId = null;
     selectedSpeciality = null;
@@ -18,7 +20,12 @@ class FacultiesStore {
 
     async getMainPageInfo() {
         try {
-            const response = await axios.get("http://25.17.147.15:8000/api/faculties");
+            // const response = await axios.get("https://e72b-92-255-89-234.ngrok-free.app/api/faculties");
+            const response = await fetch(URL,
+                {method: "GET", mode: "no-cors",
+                    headers: {"Content-Type": "application/json",
+                    "ngrok-skip-browser-warning": "true"}})
+            console.log(response)
             this.mainPageInfo = response.data;
             return this.mainPageInfo;
         } catch (error) {
