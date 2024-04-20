@@ -24,9 +24,11 @@ Vacancy = Table('vacancy', metadata,
                 Column('skills', Text))
 
 
-def getSpecialties(fakultet_id: int, custom_conn):
+def getSpecialties(fakultet_id: int):
+    custom_conn = engine.connect()
     select_all_query = db.select(Special).filter_by(fakultet_id=fakultet_id)
     select_all_results = custom_conn.execute(select_all_query)
+    custom_conn.close()
     return select_all_results.fetchall()
 
 if __name__ == '__main__':
