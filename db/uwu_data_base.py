@@ -3,11 +3,11 @@ import sqlalchemy
 from sqlalchemy import Table, Column, Integer, String, Text
 import csv
 import json
-
+import requests
 from sqlalchemy import Column, Integer, String
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-engine = create_engine('sqlite:///db/uwu.db', echo=False)
+engine = create_engine('sqlite:///uwu.db', echo=False)
 Session = sessionmaker(bind=engine)
 conn = Session()
 import sqlalchemy.orm
@@ -79,6 +79,22 @@ class Summary(Base):
     summary = Column(Text)
     subject = Column(Text)
 
+class AddEdu(Base):
+    __tablename__ = 'add_edu'
+    id = Column(Integer, primary_key=True)
+    title = Column(Text)
+    site = Column(Text)
+    org_name = Column(Text)
+    org_address = Column(Text)
+    logo_url = Column(Text)
+    type = Column(Text)
+    edu_form = Column(Text)
+    phone = Column(Text)
+    email = Column(Text)
+    starts = Column(Text)
+    cost = Column(Integer)
+    edu_len = Column(Integer)
+
 def getSpecialties(fakultet_id: int, session):
     select_all_query = session.query(Special).filter(Special.fakultet_id == fakultet_id).all()
     return select_all_query
@@ -123,6 +139,7 @@ def get_edu_prog(plan_id: int, custom_conn):
         for inf_subj in a:
             summar = conn.query(Summary).filter(Summary.subject == subj.subject).all()
             summar = 'None' if not summar else summar[0].summary
+            print('None' if not summar else summar[0].summary, subj.subject)
             semester[inf_subj.sem].append({"subject":subj.subject, "hours":inf_subj.hours,
                                             "ze": inf_subj.ze, "summary":summar})
             if inf_subj.exam:
@@ -216,6 +233,29 @@ if __name__ == '__main__':
                 conn.add(ins)
         conn.commit()
 
-    get_edu_prog(6797, conn)
+        URL = 'https://demo.pnvsh.n3dev.ru/api/v1/public/education_program/?educationType=additional&format=json&ordering=-created_at&pageSize=200&sort=&status=true&page={}'
+        API_URL = 'https://demo.pnvsh.n3dev.ru'
+        for i in range(1,10):
+            response = requests.request('GET',URL.format(1)).text
+            data = json.loads(response)
+            for edu in data['results']:
+                ins = AddEdu(
+                title = edu['title'],
+                site = edu['site'],
+                org_name = edu['organization']['shortTitle'],
+                org_address = edu['organization']['address'],
+                logo_url = API_URL + edu['organization']['logo']['url'],
+                type = edu['type']['name'],
+                edu_form = edu['educationForm']['name'],
+                phone = edu['phone'],
+                email = edu['email'],
+                starts = edu['trainingStart'],
+                cost = int(float(edu['costYear'])) if edu['costYear'] else 0,
+                edu_len = edu['scopeMonths'] + 12*edu['scopeYears'])
+
+                conn.add(ins)
+        conn.commit()
+
+    #get_edu_prog(6797, conn)
 
     conn.close()
