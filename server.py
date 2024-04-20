@@ -23,7 +23,7 @@ class bcolors:
 
 faculties = [
     { "id": 30, "long_title": "Гуманитарный факультет", "title": "ГФ" },
-    { "id": 38,	"long_title": "Институт фундаментального инженерного образования", "title": "ИФИО" },
+    #{ "id": 38,	"long_title": "Институт фундаментального инженерного образования", "title": "ИФИО" },
     { "id": 42,	"long_title": "Институт инновационного проектирования и технологического предпринимательства", "title": "ИНПРОТЕХ" },
     { "id": 24,	"long_title": "Факультет радиотехники и телекоммуникаций", "title": "ФРТ" },
     { "id": 25,	"long_title": "Факультет электроники", "title": "ФЭЛ" },
@@ -60,7 +60,10 @@ class UwURequestHandler(SimpleHTTPRequestHandler):
         self.sendText(json.dumps(data).encode())
 
     def doEGE(self, cmds, args):
-        pass
+        content_len = int(self.headers.get('Content-Length'))
+        post_body = self.rfile.read(content_len)
+        print('!!!!!!!!!!', post_body)
+        self.doSpecialty(cmds, args)
 
     def doSpecialty(self, cmds, args):
         sp = uwudb.getSpecialties(int(cmds[1]), session)
@@ -71,7 +74,7 @@ class UwURequestHandler(SimpleHTTPRequestHandler):
         , sp)))
         '''
 
-    def doAPI(self):
+    def doAPI(self, is_post: bool):
         cmd = self.path.split('/')[2:]
         arglist = list(map(lambda x: list(map(lambda y: (y[:y.find('=')], y[y.find('=') + 1:]), x[x.find('?'):][1:].split('&'))), cmd))
 
@@ -97,21 +100,32 @@ class UwURequestHandler(SimpleHTTPRequestHandler):
         elif (len(cmds) == 1 and cmds[0] == "ege"):
             self.doEGE(cmds, args)
         elif (len(cmds) == 2 and cmds[0] == "faculties"):
-            self.doSpecialty(cmds, args)
+            if is_post:
+                self.doEGE(cmds, args)
+            else:
+                self.doSpecialty(cmds, args)
         else:
             self.sendData({ "message": "ECHO", "cmds": cmds, "args": args })
             
     def do_GET(self):
         if (self.path.find('/api/') == 0):
-            self.doAPI()
+            self.doAPI(False)
         else:
             super().do_GET()
+    
+    def do_POST(self):
+        if (self.path.find('/api/') == 0):
+            self.doAPI()
+        else:
+            super().do_POST(True)
+                
 
 if __name__ == '__main__':    
     os.chdir(os.path.dirname(__file__) + "/root/")
     
     server_address = ('', 8000)
     httpd = ThreadingHTTPServer(server_address, UwURequestHandler)
+    print("Created successfully")
     httpd.serve_forever()
 
     Session.remove()
