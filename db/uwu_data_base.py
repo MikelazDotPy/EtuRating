@@ -12,6 +12,20 @@ Session = sessionmaker(bind=engine)
 conn = Session()
 import sqlalchemy.orm
 Base = sqlalchemy.orm.declarative_base()
+metadata = db.MetaData()
+
+class Priem(Base):
+    __tablename__ = 'priem'
+
+    id = Column(Integer, primary_key = True)
+    name = Column(String)
+    ege1 = Column(String)
+    ege2 = Column(String)
+    ege3 = Column(String)
+    min1 = Column(Integer)
+    min2 = Column(Integer)
+    min3 = Column(Integer)
+    last_year = Column(Integer)
 
 class Special(Base):
    __tablename__ = 'special'
@@ -26,7 +40,6 @@ class Special(Base):
    study_form_id = Column(Integer)
    study_level_id = Column(Integer)
 
-metadata = db.MetaData()
 class Vacancy(Base):
     __tablename__ = 'vacancy'
 
@@ -34,10 +47,62 @@ class Vacancy(Base):
     sphere = Column(Text)
     skills = Column(Text)
 
+
+class EtuStrPlan(Base):
+    __tablename__ = 'etu_str_plan'
+
+    id = Column(Integer, primary_key=True)
+    etu_id = Column(Integer)
+    subject = Column(Text)
+    hours = Column(Integer)
+    plan_id = Column(Integer)
+    type = Column(Text)
+
+class EtuSubject(Base):
+    __tablename__ = 'etu_subject'
+
+    id = Column(Integer, primary_key=True)
+    subject_id = Column(Integer)
+    ze = Column(Integer)
+    sem = Column(Integer)
+    exam = Column(db.Boolean)
+    exam = Column(db.Boolean)
+    exam = Column(db.Boolean)
+    exam = Column(db.Boolean)
+
+
 def getSpecialties(fakultet_id: int, session):
     select_all_query = session.query(Special).filter(Special.fakultet_id == fakultet_id).all()
     return select_all_query
-    
+
+def addPriem(conn, engine, filename):
+    r = []
+    i = 0
+    ids = set()
+    with open(filename) as f:
+        s = f.read()
+        l = json.loads(s)
+        for x in l:
+            i += 1
+            maybe_id = conn.query(Special.id).filter(Special.name == x["Направление"]).all()[0][0]
+            if maybe_id in ids:
+                continue
+            p = Priem(
+                id   = maybe_id,
+                name = x["Направление"],
+                ege1 = x["Предмет 1"],
+                ege2 = x["Предмет 2"],
+                ege3 = x["Предмет 3"],
+                min1 = x["Мин. балл 1"],
+                min2 = x["Мин. балл 2"],
+                min3 = x["Мин. балл 3"],
+                last_year = x["Балл"]
+            )
+            r.append(p)
+            ids.add(maybe_id)
+    print(i)
+    return r
+
 if __name__ == '__main__':
     Base.metadata.create_all(engine)
     
@@ -65,6 +130,7 @@ if __name__ == '__main__':
             
             ff = True
         #print(unq)
+    conn.commit()
     with open('res (4)', 'r') as f:
         jj = json.load(f)
     ff = False
@@ -73,6 +139,20 @@ if __name__ == '__main__':
             insertion = Vacancy(sphere=k, skills=str(jj[k])[1:-1].replace("'",'').replace(", ", ",").replace("\\xad", '-'))
             conn.add(insertion)
         ff = True
+
+    with open('etu_str_plans.csv', 'r') as f:
+        rows = csv.reader(f)
+        next(rows)
+        for row in rows:
+            if row[4] == 'subject':
+                insertion = EtuStrPlan(etu_id = int(row[0]), subject=row[1], hours=int(row[2]), 
+                                    plan_id = int(row[3]),type = row[4])
+                conn.add(insertion)
+    conn.commit()
+
+    for ins in addPriem(conn, engine, 'priem.json'):
+        conn.add(ins)
+        
     
     conn.commit()
     conn.close()
