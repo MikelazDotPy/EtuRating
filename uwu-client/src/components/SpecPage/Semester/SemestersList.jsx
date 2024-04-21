@@ -1,30 +1,19 @@
 import {FacultiesData} from "../../../../stores/FacultiesStore";
 import {useEffect, useState} from "react";
 import SingleSemester from "@/components/SpecPage/Semester/SingleSemester";
+import {observer} from "mobx-react";
 
-const SemestersList = ({URL}) => {
+const SemestersList = observer((data) => {
 
-
-    const [data, setData] = useState(null);
-
-    useEffect(() => {
-        const fetchData = async () => {
-            FacultiesData.getSpecialityInfo(URL).then(
-                data => {
-                    setData(data)
-                }
-            )
-        }
-        fetchData()
-    }, []);
+    // const [data, setData] = useState(null);
 
     return (
         <div className={"mt-8"}>
-            {data && data.semesters.map((semester, id) => {
-                return <SingleSemester key={id} data={semester}/>
+            {data.data.map((sem, index) => {
+                return <SingleSemester data={sem} key={index} />
             })}
         </div>
     )
-}
+})
 
 export default SemestersList

@@ -2,14 +2,15 @@ import Labels from "@/components/specialitiesList/labels";
 import SemestersList from "@/components/SpecPage/Semester/SemestersList";
 
 const SpecPage = ({data}) => {
+
     return (
         <div className="mt-6">
             <h1 className={"text-dark-grey text-[36px]"}>СПБГЭТУ "ЛЭТИ"</h1>
-            <h2 className="mt-[18px] text-[26px]">{data.title}</h2>
-            <div className="mt-[-12px]">
-                <Labels labelsList={[data.title, data.department, data.faculty]}/>
+            <h2 className="mt-[0px] text-[26px]">{data[0].name}</h2>
+            <div className="mt-[14px]">
+                    <Labels labelsList={[data[0].departament, data[0].faculty, data[0].study_form]}/>
             </div>
-            <SemestersList URL={data.URL}/>
+            <SemestersList data={data.slice(1, 10)}/>
         </div>
     )
 }

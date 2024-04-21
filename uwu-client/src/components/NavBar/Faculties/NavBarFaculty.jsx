@@ -26,9 +26,9 @@ export const Faculty = observer(({ faculty }) => {
                 onClick={handleFacultyClick}
                 className={classList + " space-x-3 text-gray-600"}
             >
-                <div>{faculty.title}</div>
-                <Link href={`/faculties/${faculty.id}`}>
-                    <FontAwesomeIcon icon={faArrowRight} />
+                {/*<div>{faculty.title}</div>*/}
+                <Link href={`/faculties/${faculty.id}`}> {/* поменять на id*/}
+                    <div>{faculty.title}</div>
                 </Link>
             </FacultyInList>
             {FacultiesData.selectedFacultyId === faculty.id && (

@@ -1,28 +1,25 @@
 import {useState} from "react";
-import Link from 'next/link'
 
-const Discipline = ({discipline, isShown}) => {
+const Discipline = ({data}) => {
 
-    const [showDescription, setShowDescription] = useState(false);
+    const [show, setShow] = useState(false);
 
     return (
         <>
-            {isShown &&
-            <div className="flex justify-between items-center w-full mt-4">
-                <div
-                    onClick={() => {setShowDescription(!showDescription)}}
-                >{discipline.title}</div>
-                <div className={"flex"}>
-                    <div className="ml-10">Зачетных единиц: {discipline.creditUnit}</div>
-                    <div className="ml-10">Часов: {discipline.hours}</div>
+            <div className="flex justify-between items-center ml-5">
+                <h5 className={"text-gray-700 mt-1 text-[14] max-w-[800px]"}
+                    onClick={() => {
+                        setShow(!show)
+                    }}
+                >○ {data.title}</h5>
+                <div className={"flex w-[300px] justify-between"}>
+                    <div className={"text-gray-600"}>Зачетных единиц: {data.ze}</div>
+                    <div className={""}>Часов: {data.hours}</div>
                 </div>
-            </div>}
-            {showDescription && isShown &&
-                <div className="mt-3 ml-5 flex flex-col space-y-2">
-                    <div>{discipline.description}</div>
-                    <Link href={`/abstract/${discipline.title}`} className="text-overall-purple">Смотреть конспекты</Link>
-                </div>
-            }
+            </div>
+            <div className={"w-[750px] ml-[50px]"}>
+                {show && data.destiption !== "None" && <div className={"text-gray-500 mt-1 mb-2"} onClick={() => {setShow(false)}}>{data.desctiption}</div>}
+            </div>
         </>
     )
 }
