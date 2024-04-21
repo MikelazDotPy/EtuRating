@@ -7,6 +7,8 @@ from db import uwu_data_base as uwudb
 from sqlalchemy.orm import sessionmaker
 
 from db.find_ege import *
+from db.add_edu import *
+from db.events import *
 
 engine = sqlalchemy.create_engine('sqlite:///db/uwu.db', echo=False)
 Session = sessionmaker(bind=engine)
@@ -46,6 +48,31 @@ study_form = {
     3: "Магистратура",
     7: "Аспирантура"
 }
+
+from fuzzywuzzy import process
+
+def specialty2dict(x):
+    return  { "id": x.id, "plan_id": x.plan_id, "name": x.name, "specialty_id": x.specialty_id,
+        "department_id": x.department_id, "department": departments[x.department_id][1],
+        "faculty_id": x.fakultet_id, "faculty": faculties_dict[x.fakultet_id]["title"],
+        "study_period": x.study_period, "type": study_form[x.study_form_id], "study_level_id": x.study_level_id }
+
+def getSpecalties(session, search: str):
+    arr = []
+    i = 0
+    while i < len(search):
+        if search[i] == '%':
+            arr.append(int(search[i + 1] + search[i + 2], base=16))
+            i += 3
+            continue
+        arr.append(ord(search[i]))
+        i += 1     
+
+    search = bytes(arr).decode('utf-8')
+    l = list(map(lambda x: x[0], session.query(Special.name).all()))
+    a = process.extractOne(search, l)[0]
+    
+    return specialty2dict(session.query(Special).filter(Special.name == a).first())
 
 class UwURequestHandler(SimpleHTTPRequestHandler):
     def do_OPTIONS(self):
@@ -96,13 +123,7 @@ class UwURequestHandler(SimpleHTTPRequestHandler):
         else:
             specialties = uwudb.getSpecialties(faculty_id, session)
 
-        self.sendData(list(map(
-            lambda x: { "id": x.id, "plan_id": x.plan_id, "name": x.name, "specialty_id": x.specialty_id,
-                        "department_id": x.department_id, "department": departments[x.department_id][1],
-                        "faculty_id": x.fakultet_id, "faculty": faculties_dict[x.fakultet_id]["title"],
-                        "study_period": x.study_period, "type": study_form[x.study_form_id], "study_level_id": x.study_level_id },
-            specialties)
-        ))
+        self.sendData(list(map(lambda x: specialty2dict(x), specialties )))
 
     def doEduProgram(self, cmds, args):
         d = uwudb.get_edu_prog(args[0]["id"], session)
@@ -129,8 +150,21 @@ class UwURequestHandler(SimpleHTTPRequestHandler):
                 cmds.append(x[:x.find('?')])
         return cmds, args
 
+    def doAdditionalEducation(self, cmds, args):
+        add_edu = getAdditionalEducation(session)
+        self.sendData(add_edu)
+        
+    def doEvents(self, cmds, args):
+        try:
+            search = args[0]["search"]
+        except IndexError:
+            self.sendData([])
+
+        self.sendData(list(map(simplifyEvent, getEvents(session, search))))
+
     def doAPI(self, is_post = False):
         cmds, args = self.parseData()
+        cmd = '/'.join(cmds)
 
         if (len(cmds) == 1 and cmds[0] == "faculties"):
             self.sendData(faculties)
@@ -138,6 +172,12 @@ class UwURequestHandler(SimpleHTTPRequestHandler):
             self.doSpecialty(cmds, args, is_post)
         elif (len(cmds) == 1 and cmds[0] == "edu_prog"):
             self.doEduProgram(cmds, args)
+        elif (len(cmds) == 1 and cmds[0] == "events"):
+            self.doEvents(cmds, args)
+        elif (len(cmds) == 1 and cmds[0] == "add_edu"):
+            self.doAdditionalEducation(cmds, args)
+        elif (len(cmds) == 1 and cmds[0] == 'search'):
+            self.sendData(getSpecalties(session, args[0]["search"]))
         else:
             self.sendData({ "message": "ECHO", "cmds": cmds, "args": args })
             
