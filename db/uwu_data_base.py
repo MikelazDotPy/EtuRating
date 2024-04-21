@@ -157,7 +157,7 @@ def get_edu_prog(plan_id: int, custom_conn):
             summar = conn.query(Summary).filter(Summary.subject == subj.subject).all()
             summar = 'None' if not summar else summar[0].summary
             semester[inf_subj.sem].append({"subject":subj.subject, "hours":inf_subj.hours,
-                                            "ze": inf_subj.ze, "summary":summar})
+                                            "ze": inf_subj.ze, "summary":summar[:min(200, len(summar))]})
             semester[inf_subj.sem].sort(key=lambda x: x["hours"], reverse=True)
             if inf_subj.exam:
                 exams[inf_subj.sem].append(subj.subject)
