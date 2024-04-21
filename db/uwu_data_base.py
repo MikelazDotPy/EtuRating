@@ -105,6 +105,9 @@ def getSpecialties(fakultet_id: int, session):
     select_all_query = session.query(Special).filter(Special.fakultet_id == fakultet_id).all()
     return select_all_query
 
+def get_awesome_proff_sphere(plan_id: int, session):
+    pass
+
 def addPriem(conn, engine, filename):
     r = []
     i = 0
@@ -167,7 +170,7 @@ def get_edu_prog(plan_id: int, custom_conn):
         "offsets": offsets,
         "diff_offsets": diff_offsets,
         "course_works": course_works,
-        "departament": departments[special.department_id],
+        "departament": departments[special.department_id][1],
         "faculty": facs[special.fakultet_id]
     }
     return d
