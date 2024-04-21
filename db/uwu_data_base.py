@@ -102,6 +102,16 @@ class AddEdu(Base):
     cost = Column(Integer)
     edu_len = Column(Integer)
 
+class FullVac(Base):
+    __tablename__ = 'fullvac'
+
+    id = Column(Integer, primary_key=True)
+    sphere = Column(Integer)
+    exp = Column(Integer)
+    name = Column(Integer)
+    skills = Column(Integer)
+
+
 def getSpecialties(fakultet_id: int, session):
     select_all_query = session.query(Special).filter(Special.fakultet_id == fakultet_id).all()
     return select_all_query
@@ -126,6 +136,7 @@ def get_awesome_proff_sphere(plan_id: int, session):
             if skill in d: score += d[skill]
         spheres.append([sphere, score])
     spheres.sort(key=lambda x: x[1], reverse=True)
+    ans = [{}]
     print(spheres)
 
 def addPriem(conn, engine, filename):
@@ -174,6 +185,7 @@ def get_edu_prog(plan_id: int, custom_conn):
     ans[0]["departament"] = departments[special.department_id][1]
     ans[0]["faculty"] = facs[special.fakultet_id]
     ans[0]["study_form"] = study_form[special.study_form_id]
+    ans[0]["name"] = special.name
     subjects = conn.query(EtuStrPlan).filter(EtuStrPlan.plan_id == plan_id).all()
     for subj in subjects:
         a = conn.query(EtuSubject).filter(EtuSubject.plan_str_id == subj.etu_id).all()
@@ -300,12 +312,26 @@ if __name__ == '__main__':
                 names.add(edu['title'])
         conn.commit()
 
+        with open("vacp.csv", "r") as f:
+            rows = csv.reader(f)
+            next(rows)
+            for row in rows:
+                ins = FullVac(
+                    sphere = row[0],
+                    exp = row[1],
+                    name = row[2],
+                    skills = row[3])
+                conn.add(ins)
+        
+        conn.commit()
+
+
     #get_edu_prog(6797, conn)
     #a = conn.query(AddEdu.org_name).all()
     #s = set(x for x in a)
     #print(s, len(s))
-    #get_awesome_proff_sphere(6738,conn)
-    t1 = time.time()
-    print(get_edu_prog(6738, conn))
-    print(time.time() - t1)
+    get_awesome_proff_sphere(6738,conn)
+    #t1 = time.time()
+    #print(get_edu_prog(6738, conn))
+    #print(time.time() - t1)
     conn.close()
