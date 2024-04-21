@@ -190,7 +190,7 @@ def get_edu_prog(plan_id: int, custom_conn):
                 'ze': inf_subj.ze,
                 'hours': inf_subj.hours
             })
-            ans[inf_subj.sem]['disciplines'].sort(key=lambda x: x["hours"], reverse=True)
+            #ans[inf_subj.sem]['disciplines'].sort(key=lambda x: x["hours"], reverse=True)
             if inf_subj.exam:
                 ans[inf_subj.sem]['exams'].append(subj.subject)
             if inf_subj.offset:
@@ -318,6 +318,6 @@ if __name__ == '__main__':
     #a = conn.query(AddEdu.org_name).all()
     #s = set(x for x in a)
     #print(s, len(s))
-    #get_awesome_proff_sphere(6738,conn)
-    print(get_edu_prog(6738, conn))
+    get_awesome_proff_sphere(6738,conn)
+    #print(get_edu_prog(6738, conn))
     conn.close()
