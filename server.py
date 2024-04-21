@@ -162,6 +162,9 @@ class UwURequestHandler(SimpleHTTPRequestHandler):
 
         self.sendData(list(map(simplifyEvent, getEvents(session, search))))
 
+    def doVacancy(self, cmds, args):
+        
+
     def doAPI(self, is_post = False):
         cmds, args = self.parseData()
         cmd = '/'.join(cmds)
@@ -178,6 +181,8 @@ class UwURequestHandler(SimpleHTTPRequestHandler):
             self.doAdditionalEducation(cmds, args)
         elif (len(cmds) == 1 and cmds[0] == 'search'):
             self.sendData(getSpecalties(session, args[0]["search"]))
+        elif (len(cmds) == 1 and cmds[0] == 'vacancy'):
+            self.doVacancy(cmds, args)
         else:
             self.sendData({ "message": "ECHO", "cmds": cmds, "args": args })
             
