@@ -116,6 +116,10 @@ def getSpecialties(fakultet_id: int, session):
     select_all_query = session.query(Special).filter(Special.fakultet_id == fakultet_id).all()
     return select_all_query
 
+def get_beatiful_phone_number(phone):
+    return f'+{phone[0]} ({phone[1:4]}) {phone[4]}-{phone[5]}-{phone[6]}'
+
+
 def get_very_interesting_add_edu(sesssion):
     ans = [{'title': PNVHS_add_edu_sphere[x], 'education':[]} for x in PNVHS_add_edu_sphere]
     i = 0
@@ -129,7 +133,7 @@ def get_very_interesting_add_edu(sesssion):
                        'logo_url': edu.logo_url,
                        'type': edu.type,
                        'edu_form': edu.edu_form,
-                       'phone': edu.phone,
+                       'phone': get_beatiful_phone_number(edu.phone),
                        'email': edu.email,
                        'starts': edu.starts,
                        'cost': edu.cost,
@@ -363,7 +367,7 @@ if __name__ == '__main__':
     #a = conn.query(AddEdu.org_name).all()
     #s = set(x for x in a)
     #print(s, len(s))
-    #get_awesome_proff_sphere(6738,conn)
+    #print(json.dumps(get_awesome_proff_sphere(6738,conn)))
     #t1 = time.time()
     #print(get_edu_prog(6738, conn))
     #print(time.time() - t1)
