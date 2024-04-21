@@ -164,8 +164,9 @@ def get_awesome_proff_sphere(plan_id: int, session):
         spheres.append([sphere, score])
     spheres.sort(key=lambda x: x[1], reverse=True)
     ans = []
+    i = 0
     for x in spheres[:3]:
-        a = session.query(FullVac).filter(FullVac.sphere == x[0]).all()[:3]
+        a = session.query(FullVac).filter(FullVac.sphere == x[i]).all()[:3]
         nice_vacancy = []
         for y in a:
             tmp = {}
@@ -173,7 +174,8 @@ def get_awesome_proff_sphere(plan_id: int, session):
             tmp['exp'] = y.name
             tmp['skills'] = json.loads(y.skills)
             nice_vacancy.append(tmp)
-        ans.append({'title': x[0], 'vacansions':nice_vacancy})
+        ans.append({'title': x[i], 'vacansions':nice_vacancy})
+        i += 1
     return ans
 
 def addPriem(conn, engine, filename):
