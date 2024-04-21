@@ -13,34 +13,44 @@ translate_table = {
     "biology": "Биология",
     "breaking_bad": "Химия",
     "society": "Обществознание",
-    "english": "Иностранный язык"
+    "english": "Английский язык"
 }
 
-def translateEGE(data):
-    newdata = []
-    for i in data:
-        newdata.append({ "value": i["value"], "type": translate_table[i["type"]] })
-    return newdata
+class Exam:
+    def __init__(self, type : str, points : int):
+        self.type = type
+        self.points = points
 
-def findEGE(session, data, additional):
-    s = data[0]["value"] + data[1]["value"] + data[2]["value"] + additional
-    res = []
+    def __str__(self) -> str:
+        return f"<Exam '{self.type}': {self.points}>"
+    
+    def __repr__(self) -> str:
+        return self.__str__()
+                
 
-    for i in itertools.permutations(data):
-        print("!!!!!! sum", s)
-        print('############### check permutation', i)
-        x = session.query(Priem) \
-            .filter(Priem.ege1 == i[0]["type"]) \
-            .filter(Priem.ege2 == i[1]["type"]) \
-            .filter(Priem.ege3 == i[2]["type"]) \
-            .filter(Priem.min1 <= i[0]["value"]) \
-            .filter(Priem.min2 <= i[1]["value"]) \
-            .filter(Priem.min3 <= i[2]["value"]) \
+def translateEGE(exams: list):
+    newexams = []
+    for exam in exams:
+        newexams.append(Exam(translate_table[exam.type], exam.points))
+    return newexams
+
+def findEGE(session, exams: list, additional : int):
+    s = exams[0].points + exams[1].points + exams[2].points + additional
+    result = []
+
+    for permutation in itertools.permutations(exams):
+        q = session.query(Priem) \
+            .filter(Priem.ege1 == permutation[0].type) \
+            .filter(Priem.ege2 == permutation[1].type) \
+            .filter(Priem.ege3 == permutation[2].type) \
+            .filter(Priem.min1 <= permutation[0].points) \
+            .filter(Priem.min2 <= permutation[1].points) \
+            .filter(Priem.min3 <= permutation[2].points) \
             .filter(Priem.last_year <= int(s * 1.1)) \
             .all()
-        res += x
+        result += q
     
-    return list(map(lambda x: x.id, res))
+    return list(map(lambda exam: exam.id, result))
 
 def getSpecialtiesFromIDs(session, ids):
     return session.query(Special).filter(Special.id.in_(ids)).all()

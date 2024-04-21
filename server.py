@@ -63,39 +63,46 @@ class UwURequestHandler(SimpleHTTPRequestHandler):
         self.send_header('Access-Control-Allow-Methods', '*')
         self.end_headers()
         self.wfile.write(text)
-        print(f"{bcolors.OKGREEN}{self.date_time_string()} {bcolors.OKBLUE}send: '{text}'{bcolors.ENDC}")
+        #print(f"{bcolors.OKGREEN}{self.date_time_string()} {bcolors.OKBLUE}send: '{text}'{bcolors.ENDC}")
 
     def sendData(self, data):
         self.sendText(json.dumps(data).encode())
 
     def doSpecialty(self, cmds, args, is_post):
-        print(self.post_body)
-        sp = []
-        if is_post:
-            j = json.loads(self.post_body)
-            # print(j)
-            if all(map(lambda x: x["type"] != None and x["points"] != None, j)):
-                data = list(map(lambda x: { "type": x["type"], "value": int(x["points"]) }, j))
-                additional = 0
-                data = translateEGE(data)
-                l = findEGE(session, data, additional)
-                sp = list(filter(lambda x: x.fakultet_id == int(cmds[1]), getSpecialtiesFromIDs(session, l)))
-            else:
-                sp = uwudb.getSpecialties(int(cmds[1]), session)
+        print("POST_BODY:", self.post_body)
+
+        specialties = []
+        faculty_id = cmds[1]
+
+        if not is_post:
+            print("ERROR: EXPECTED POST")
+            return []
+
+        json_exams = json.loads(self.post_body)
+        print("JSON_EXAMS:", json_exams)
+        if all(map(lambda exam: exam["type"] != None and exam["points"] != None, json_exams)):
+            data = list(map(lambda exam: Exam(exam["type"], int(exam["points"])), json_exams))
+            additional = 0
+            print("DATA:", data)
+
+            data = translateEGE(data)
+            print("TRANSLATED DATA:", data)
+            ids = findEGE(session, data, additional)
+            print("IDS:", ids)
+            specialties = list(filter(
+                lambda x: x.fakultet_id == faculty_id,
+                getSpecialtiesFromIDs(session, ids)
+            ))
         else:
-            print("!!! EXPECTED POST")
-        """
-            if args[1]['points1'] != 'null' and args[1]['points2'] != 'null' and args[1]['points3'] != 'null' and args[1]['ege1'] != 'null' and args[1]['ege2'] != 'null' and args[1]['ege3'] != 'null':
-                data = [ { "type": args[1]["ege1"], "value": int(args[1]["points1"]) }, { "type": args[1]["ege2"], "value": int(args[1]["points2"]) }, { "type": args[1]["ege3"], "value": int(args[1]["points3"]) } ]
-                additional = args[1]['additional'] if ('additional' in args[1].keys()) else 0
-                data = translateEGE(data)
-                l = findEGE(session, data, additional)
-                sp = getSpecialtiesFromIDs(session, l)
-            else:
-                sp = uwudb.getSpecialties(int(cmds[1]), session)
-        """
-        print(sp)
-        self.sendData(list(map(lambda x: { "id": x.id, "plan_id": x.plan_id, "name": x.name, "specialty_id": x.specialty_id, "department_id": x.department_id, "department": departments[x.department_id][1],"faculty_id": x.fakultet_id, "faculty": faculties_dict[x.fakultet_id]["title"], "study_period": x.study_period, "type": study_form[x.study_form_id], "study_level_id": x.study_level_id }, sp)))
+            specialties = uwudb.getSpecialties(faculty_id, session)
+
+        self.sendData(list(map(
+            lambda x: { "id": x.id, "plan_id": x.plan_id, "name": x.name, "specialty_id": x.specialty_id,
+                        "department_id": x.department_id, "department": departments[x.department_id][1],
+                        "faculty_id": x.fakultet_id, "faculty": faculties_dict[x.fakultet_id]["title"],
+                        "study_period": x.study_period, "type": study_form[x.study_form_id], "study_level_id": x.study_level_id },
+            specialties)
+        ))
 
     def doEduProgram(self, cmds, args):
         d = uwudb.get_edu_prog(args[0]["id"], session)
@@ -141,7 +148,7 @@ class UwURequestHandler(SimpleHTTPRequestHandler):
             super().do_GET() 
 
     def do_POST(self):
-        cmds, args = self.parseData()
+        self.cmds, self.args = self.parseData()
 
         self.content_len = int(self.headers.get('Content-Length'))
         self.post_body = self.rfile.read(self.content_len).decode()
