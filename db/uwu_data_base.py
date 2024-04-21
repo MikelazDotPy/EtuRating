@@ -204,7 +204,7 @@ def get_edu_prog(plan_id: int, custom_conn):
             summar = 'None' if not summar else summar[0].summary
             ans[inf_subj.sem]['disciplines'].append({
                 'title': subj.subject,
-                'desctiption': summar[:min(200, len(summar))],
+                'desctiption': summar[:min(500, len(summar))],
                 'ze': inf_subj.ze,
                 'hours': inf_subj.hours
             })
