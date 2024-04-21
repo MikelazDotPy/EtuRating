@@ -99,7 +99,7 @@ class UwURequestHandler(SimpleHTTPRequestHandler):
         print("POST_BODY:", self.post_body)
 
         specialties = []
-        faculty_id = cmds[1]
+        faculty_id = int(cmds[1]) 
 
         if not is_post:
             print("ERROR: EXPECTED POST")
@@ -155,15 +155,16 @@ class UwURequestHandler(SimpleHTTPRequestHandler):
         self.sendData(add_edu)
         
     def doEvents(self, cmds, args):
-        try:
-            search = args[0]["search"]
-        except IndexError:
-            self.sendData([])
-
-        self.sendData(list(map(simplifyEvent, getEvents(session, search))))
+        events = []
+        if "id" in args[0].keys():
+            events = getEvents("", getSuitableRNFs(session, args[0]["id"]))
+        else:
+            events = getEvents("", [])
+        self.sendData(list(map(simplifyEvent, events)))
 
     def doVacancy(self, cmds, args):
-        
+        q = uwudb.get_awesome_proff_sphere(args[0]["id"], session)
+        self.sendData(q)
 
     def doAPI(self, is_post = False):
         cmds, args = self.parseData()
