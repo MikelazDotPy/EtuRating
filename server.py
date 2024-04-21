@@ -180,6 +180,8 @@ class UwURequestHandler(SimpleHTTPRequestHandler):
             self.doEvents(cmds, args)
         elif (len(cmds) == 1 and cmds[0] == "add_edu"):
             self.doAdditionalEducation(cmds, args)
+        elif (len(cmds) == 1 and cmds[0] == "add_edu_v2"):
+            self.sendData(get_awesome_proff_sphere(session))
         elif (len(cmds) == 1 and cmds[0] == 'search'):
             self.sendData(getSpecalties(session, args[0]["search"]))
         elif (len(cmds) == 1 and cmds[0] == 'vacancy'):

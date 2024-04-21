@@ -1,43 +1,36 @@
-import db.uwuconfig as cfg
-import requests as r
 import json
-import db.uwu_data_base as db
-from fuzzywuzzy import process
+import requests as r
+import uwuconfig as cfg
 
 class Event:
-    def __init__(self, eventFormat: str = ""):
-        self.eventFormat = eventFormat
+    def __init__(self, id, name, tags):
+        self.id = id
+        self.name = name
+        self.tags = tags
 
-def simplifyEvent(event):
-    return { 'id': event['id'],  }
+class Tag:
+    def __init__(self, id, name):
+        self.id = id
+        self.name = name
 
-def getEvents(search: str, rnf: list):
-    return json.loads(r.get(cfg.spb_pnvsh_url + f'/api/v1/public/event?isArchive=false&memberStatuses=enrollee,worker&search={search}&rnf={",".join(rnf)}').text)
+    def __str__(self):
+        return f'\{ "id": {self.id}, "name": "{self.name}" \}'
 
-def getRNFList():
-    result = []
-    a = json.loads(r.get(cfg.spb_pnvsh_url + f'/api/v1/public/rnf/list/').text)
-    while a['next'] != None:
-        result += a['results']
-        a = json.loads(r.get(a['next']).text)
-    
-    result += a['results']
-    return result
+    def __repr__(self):
+        return self.__str__()
 
-def getRNF(id):
-    return json.loads(r.get(cfg.spb_pnvsh_url + f'/api/v1/public/rnf/{id}').text)
+def getTags():
+    js = json.loads(r.get(cfg.spb_pnvsh_url + "/api/v1/public/rnf/list/").text)
+    l = []
 
-rnf = getRNFList()
+    while (js["next"] != None):
+        data = js["results"]
+        for i in data:
+            l.append(Tag(i["id"], i["name"]))
 
-def getSuitableRNFs(session, plan_id):
-    q = session.query(db.EtuStrPlan.subject).filter(db.EtuStrPlan.plan_id == plan_id).all()
-    res = []
-    for x in q:
-        arr = list(map(lambda x: x[0], process.extract(x[0], rnf, limit=3)))
-        arr += res
-    return res
+        js = json.loads(r.get(js["next"]).text)
+    return l
 
 if __name__ == "__main__":
-    #print(getEvents(""))
-    print(getRNFList())
-    
+    x = getTags()
+    print(x)
