@@ -3,6 +3,7 @@ import sqlalchemy
 from sqlalchemy import Table, Column, Integer, String, Text
 import csv
 import json
+import time
 import requests
 from sqlalchemy import Column, Integer, String
 from sqlalchemy import create_engine
@@ -173,11 +174,6 @@ def get_edu_prog(plan_id: int, custom_conn):
     ans[0]["departament"] = departments[special.department_id][1]
     ans[0]["faculty"] = facs[special.fakultet_id]
     ans[0]["study_form"] = study_form[special.study_form_id]
-    semester = {i:[] for i in range(1, 10)}
-    exams = {i:[] for i in range(1, 10)}
-    offsets = {i:[] for i in range(1, 10)}
-    diff_offsets = {i:[] for i in range(1, 10)}
-    course_works = {i:[] for i in range(1, 10)}
     subjects = conn.query(EtuStrPlan).filter(EtuStrPlan.plan_id == plan_id).all()
     for subj in subjects:
         a = conn.query(EtuSubject).filter(EtuSubject.plan_str_id == subj.etu_id).all()
@@ -190,7 +186,7 @@ def get_edu_prog(plan_id: int, custom_conn):
                 'ze': inf_subj.ze,
                 'hours': inf_subj.hours
             })
-            #ans[inf_subj.sem]['disciplines'].sort(key=lambda x: x["hours"], reverse=True)
+            ans[inf_subj.sem]['disciplines'].sort(key=lambda x: x["hours"], reverse=True)
             if inf_subj.exam:
                 ans[inf_subj.sem]['exams'].append(subj.subject)
             if inf_subj.offset:
@@ -200,16 +196,6 @@ def get_edu_prog(plan_id: int, custom_conn):
             if inf_subj.course_work:
                 ans[inf_subj.sem ]['kursah'] = subj.subject
     
-    d = {
-        "semester": semester,
-        "exams": exams,
-        "offsets": offsets,
-        "diff_offsets": diff_offsets,
-        "course_works": course_works,
-        "departament": departments[special.department_id][1],
-        "faculty": facs[special.fakultet_id],
-        "study_form": study_form[special.study_form_id]
-    }
     return ans
 
 if __name__ == '__main__':
@@ -318,6 +304,8 @@ if __name__ == '__main__':
     #a = conn.query(AddEdu.org_name).all()
     #s = set(x for x in a)
     #print(s, len(s))
-    get_awesome_proff_sphere(6738,conn)
-    #print(get_edu_prog(6738, conn))
+    #get_awesome_proff_sphere(6738,conn)
+    t1 = time.time()
+    print(get_edu_prog(6738, conn))
+    print(time.time() - t1)
     conn.close()
