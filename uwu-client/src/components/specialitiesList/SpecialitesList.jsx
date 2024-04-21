@@ -8,14 +8,14 @@ const SpecList = observer(({ specialitiesData }) => {
         <>
         <Filter/>
         <div className="space-y-10 mt-8">
-            {/*{specialitiesData.map((spec, index) => {*/}
-            {/*    if (FacultiesData.specialitiesFilter !== null && spec.type === FacultiesData.specialitiesFilter) {*/}
-            {/*        return <SpecInList {...specialitiesData[index]}/>*/}
-            {/*    }*/}
-            {/*    if (FacultiesData.specialitiesFilter === null) {*/}
-            {/*        return <SpecInList {...specialitiesData[index]}/>*/}
-            {/*    }*/}
-            {/*})}*/}
+            {specialitiesData.map((spec, index) => {
+                if (FacultiesData.specialitiesFilter !== null && spec.type === FacultiesData.specialitiesFilter) {
+                    return <SpecInList {...specialitiesData[index]}/>
+                }
+                if (FacultiesData.specialitiesFilter === null) {
+                    return <SpecInList {...specialitiesData[index]}/>
+                }
+            })}
         </div>
     </>)
 })

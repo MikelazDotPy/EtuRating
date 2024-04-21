@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { FacultiesData } from "../../../../stores/FacultiesStore";
 import SpecList from "@/components/specialitiesList/SpecialitesList";
-import { useRouter } from 'next/navigation';
 import {observer} from "mobx-react";
 
 
@@ -15,14 +14,13 @@ const Page = observer(() => {
 
     useEffect(() => {
         const getData = async () => {
-            console.log(URL_ID, FacultiesData.examPoints)
+            console.log(URL_ID, FacultiesData.examPoints[0].points)
             const data = await FacultiesData.fetchFacultiesData(URL_ID, FacultiesData.examPoints)
-            console.log(data)
-            console.log(facultyData)
             setFacultyData(data)
+            console.log(facultyData)
         }
         getData()
-    }, [URL_ID]);
+    }, [URL_ID, FacultiesData.selectedFacultyId, FacultiesData.mainPageInfo]);
 
     return (
         <div className="mt-10">

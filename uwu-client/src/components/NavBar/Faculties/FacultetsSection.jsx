@@ -4,8 +4,9 @@ import Image from "next/image";
 import FacultiesSVG from "../../../../public/graduation-hat 1.svg";
 import FacultiesList from "@/components/NavBar/Faculties/FacultiesList";
 import React from "react";
+import {observer} from "mobx-react";
 
-const FacultetsSection = () => {
+const FacultetsSection = observer(() => {
 
     const [show, setShow] = React.useState(false);
 
@@ -25,6 +26,6 @@ const FacultetsSection = () => {
             </div>}
         </>
     )
-}
+})
 
 export default FacultetsSection;

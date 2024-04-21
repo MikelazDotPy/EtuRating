@@ -21,6 +21,7 @@ class FacultiesStore {
     facultyData = null;
     specialitiesFilter = null;
     mainPageInfo = null;
+    // openSpecialityInfo = null;
     examPoints = [{type: null, points: null}, {type: null, points: null}, {type: null, points: null}]
 
     constructor() {
@@ -68,7 +69,9 @@ class FacultiesStore {
         this.searchText = null;
     }
 
-    async fetchFacultiesData(id, body) {
+    async fetchFacultiesData(id, body)
+    {
+        console.log(body[0].type, body[0].points, body[1].type, body[1].points, body[2].type, body[2].points);
         if (body) {
             try {
                 const res = await axios.post(URL + `/${id}`, body)
@@ -91,7 +94,14 @@ class FacultiesStore {
     }
 
     async getSpecialityInfo(URL) {
-        return await SPECIALITIES.find(spec => spec.URL === URL)
+        if (URL != "[object Object]" && URL !== null) {
+            console.log("URL", URL)
+            const res = await axios.get(`http://localhost:8000/api/edu_prog?id=${URL}`);
+            this.openSpecialityInfo = res.data;
+            console.log(this.openSpecialityInfo)
+
+            return this.openSpecialityInfo;
+        }
     }
 
     changeExamPoints = (id, amount) => {
@@ -99,6 +109,7 @@ class FacultiesStore {
     }
 
     changeExamType = (id, type) => {
+        console.log(id, type)
         this.examPoints[id-1].type = type.not_russian
     }
 
@@ -123,5 +134,5 @@ export const DispciplinesExams = [
     {russian: "Биология", not_russian: "biology"},
     {russian: "Химия", not_russian: "breaking_bad"},
     {russian: "Обществознание", not_russian: "society"},
-    {russian: "Иностранный язык", not_russian: "english"},
+    {russian: "Английский язык", not_russian: "english"},
 ]

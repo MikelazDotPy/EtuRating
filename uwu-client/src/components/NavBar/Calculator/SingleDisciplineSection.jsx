@@ -18,9 +18,9 @@ const SingleDisciplineSection = ({id}) => {
     return (
         <div className="mt-4">
             <Dropdown title={titleString} className="text-gray-800 bg-white p-2">
-                {DispciplinesExams.map(exam => (
+                {DispciplinesExams.map((exam, number) => (
                     <Dropdown.Item
-                        key={exam}
+                        key={number}
                         className="text-gray-600 ml-4 mt-[8px] cursor-pointer w-full h-8"
                         onClick={() => {
                             setTitleString(exam.russian);
@@ -33,7 +33,7 @@ const SingleDisciplineSection = ({id}) => {
             </Dropdown>
             <input
                 type="text"
-                value={examPoints}
+                value={examPoints || ""}
                 className="pl-2 outline-none mt-2 w-full h-10"
                 onChange={changePoints}
                 placeholder={"Баллы"}
