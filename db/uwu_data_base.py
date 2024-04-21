@@ -15,6 +15,12 @@ Base = sqlalchemy.orm.declarative_base()
 metadata = db.MetaData()
 csv.field_size_limit(200000)
 
+PNVHS_add_edu_sphere = {
+    'Академия транспортных технологий': 'Промышленный сектор',
+    'Государственный университет морского и речного флота имени адмирала С.О. Макарова': 'Повышение квалификации',
+    'Академия управления городской средой, градостроительства и печати': 'IT',
+}
+
 class Priem(Base):
     __tablename__ = 'priem'
 
@@ -235,10 +241,13 @@ if __name__ == '__main__':
 
         URL = 'https://demo.pnvsh.n3dev.ru/api/v1/public/education_program/?educationType=additional&format=json&ordering=-created_at&pageSize=200&sort=&status=true&page={}'
         API_URL = 'https://demo.pnvsh.n3dev.ru'
-        for i in range(1,10):
+        names = set()
+        for i in range(1,40):
             response = requests.request('GET',URL.format(1)).text
             data = json.loads(response)
             for edu in data['results']:
+                if edu['title'] in names:
+                    continue
                 ins = AddEdu(
                 title = edu['title'],
                 site = edu['site'],
@@ -254,8 +263,12 @@ if __name__ == '__main__':
                 edu_len = edu['scopeMonths'] + 12*edu['scopeYears'])
 
                 conn.add(ins)
+
+                names.add(edu['title'])
         conn.commit()
 
     #get_edu_prog(6797, conn)
-
+    #a = conn.query(AddEdu.org_name).all()
+    #s = set(x for x in a)
+    #print(s, len(s))
     conn.close()
