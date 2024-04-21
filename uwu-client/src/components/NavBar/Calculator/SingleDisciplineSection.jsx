@@ -5,7 +5,7 @@ import { Dropdown } from 'rsuite';
 import { DispciplinesExams, FacultiesData } from "../../../../stores/FacultiesStore";
 import {observer} from "mobx-react";
 
-const SingleDisciplineSection = ({id}) => {
+const SingleDisciplineSection = observer(({id}) => {
     const [titleString, setTitleString] = useState("Предмет");
     const [examPoints, setExamPoints] = useState(null);
 
@@ -40,7 +40,7 @@ const SingleDisciplineSection = ({id}) => {
             />
         </div>
     )
-}
+})
 
 
 export default SingleDisciplineSection;

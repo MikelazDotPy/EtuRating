@@ -1,15 +1,23 @@
-import {FacultiesData} from "../../../stores/FacultiesStore";
+import { useRouter } from 'next/navigation';
 import {observer} from "mobx-react";
+import {FacultiesData} from "../../../stores/FacultiesStore";
 
 const Search = observer(() => {
+    const router = useRouter();
 
     const handleChange = (event) => {
         FacultiesData.changeSearchText(event.target.value);
     }
 
-    const submitSearch = (event) => {
-        if (event.key === "Enter")
-        FacultiesData.getSearchData()
+    const submitSearch = async (event) => {
+        if (event.key === "Enter") {
+            const res = await FacultiesData.getSearchData();
+            console.log("res" + res);
+            if (res) {
+                await router.push(`/faculties/specialities/${res}`);
+            }
+
+        }
     }
 
     return (
@@ -23,6 +31,6 @@ const Search = observer(() => {
             />
         </>
     )
-})
+});
 
-export default Search
+export default Search;

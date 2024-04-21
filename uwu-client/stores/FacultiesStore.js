@@ -1,4 +1,4 @@
-import { makeAutoObservable } from "mobx";
+import {action, makeAutoObservable} from "mobx";
 import axios from "axios";
 
 import {FacultiesDATA, SPECIALITIES} from "./dataStubs";
@@ -21,11 +21,15 @@ class FacultiesStore {
     facultyData = null;
     specialitiesFilter = null;
     mainPageInfo = null;
+    vacanyInfo = null;
+    extraEduCatoin = null;
     // openSpecialityInfo = null;
     examPoints = [{type: null, points: null}, {type: null, points: null}, {type: null, points: null}]
 
     constructor() {
-        makeAutoObservable(this);
+        makeAutoObservable(this, {
+            clearExamPoints: action,
+        });
         // this.loadStateFromStorage();
     }
 
@@ -57,16 +61,23 @@ class FacultiesStore {
         }
     }
 
+    clearExamPoints() {
+        this.examPoints = [{type: null, points: null}, {type: null, points: null}, {type: null, points: null}];
+    }
+
     changeActiveSpeciality(speciality) {
         this.selectedSpeciality = speciality.id;
     }
 
     changeSearchText(text) {
-        this.searchText = text
+        this.searchText = text;
     }
 
-    getSearchData(){
+    async getSearchData(){
+        console.log(this.searchText)
+        const res = await axios.get(`http://localhost:8000/api/search?search=${this.searchText}`);
         this.searchText = null;
+        return res.data.plan_id;
     }
 
     async fetchFacultiesData(id, body)
@@ -87,7 +98,7 @@ class FacultiesStore {
         this.facultyData = res.data;
         return this.facultyData;
     }
-
+    // add_edu_v2
 
     changeFilter(filter) {
         this.specialitiesFilter = filter;
@@ -118,10 +129,20 @@ class FacultiesStore {
         return discipline ? discipline.not_russian : null;
     }
 
+    async getVacancy(id) {
+        const res = await axios.get(`http://localhost:8000/api/vacancy?id=${id}`)
+        this.vacanyInfo = res.data;
+        return this.vacanyInfo
+    }
+
+    async getExtraEducationData() {
+        const res = await axios.get("http://localhost:8000/api/add_edu")
+        this.extraEduCatoin = res.data
+        return res.data
+    }
 }
 
 export const FacultiesData = new FacultiesStore();
-
 
 export const DispciplinesExams = [
     {russian: "Русский язык", not_russian: "russian"},
