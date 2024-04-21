@@ -116,6 +116,29 @@ def getSpecialties(fakultet_id: int, session):
     select_all_query = session.query(Special).filter(Special.fakultet_id == fakultet_id).all()
     return select_all_query
 
+def get_very_interesting_add_edu(sesssion):
+    ans = [{'title': PNVHS_add_edu_sphere[x], 'education':[]} for x in PNVHS_add_edu_sphere]
+    i = 0
+    for x in PNVHS_add_edu_sphere:
+        edus = sesssion.query(AddEdu).filter(AddEdu.org_name == x).all()
+        for edu in edus:
+            ans[i]['education'].append({'title': edu.title,
+                       'site': edu.site,
+                       'org_name': edu.org_name,
+                       'org_address': edu.org_address,
+                       'logo_url': edu.logo_url,
+                       'type': edu.type,
+                       'edu_form': edu.edu_form,
+                       'phone': edu.phone,
+                       'email': edu.email,
+                       'starts': edu.starts,
+                       'cost': edu.cost,
+                       'edu_len': edu.edu_len})
+        i += 1
+    return(ans)
+
+
+
 def get_awesome_proff_sphere(plan_id: int, session):
     d = {}
     subjects = conn.query(EtuStrPlan).filter(EtuStrPlan.plan_id == plan_id).all()
@@ -344,4 +367,5 @@ if __name__ == '__main__':
     #t1 = time.time()
     #print(get_edu_prog(6738, conn))
     #print(time.time() - t1)
+    #get_very_interesting_add_edu(conn)
     conn.close()
