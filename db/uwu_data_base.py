@@ -106,7 +106,26 @@ def getSpecialties(fakultet_id: int, session):
     return select_all_query
 
 def get_awesome_proff_sphere(plan_id: int, session):
-    pass
+    d = {}
+    subjects = conn.query(EtuStrPlan).filter(EtuStrPlan.plan_id == plan_id).all()
+    for subj in subjects:
+        a = conn.query(EtuSubject).filter(EtuSubject.plan_str_id == subj.etu_id).all()
+        for inf_subj in a:
+            if subj.subject not in d:
+                d[subj.subject] = 0
+            d[subj.subject] += inf_subj.ze
+    d_sphere = {}
+    spheres = []
+    for sphere in session.query(Vacancy).all():
+        if sphere.sphere != '' and sphere.sphere:
+            d_sphere[sphere.sphere] = sphere.skills.split(',')
+    for sphere in d_sphere:
+        score = 0
+        for skill in d_sphere[sphere]:
+            if skill in d: score += d[skill]
+        spheres.append([sphere, score])
+    spheres.sort(key=lambda x: x[1], reverse=True)
+    print(spheres)
 
 def addPriem(conn, engine, filename):
     r = []
@@ -145,6 +164,12 @@ def get_edu_prog(plan_id: int, custom_conn):
     3: "Магистратура",
     7: "Аспирантура"}
     departments = {1: ['Автоматики и процессов управления', 'АПУ'], 2: ['"Информационные системы"', 'ИС'], 3: ['Биотехнических систем', 'БТС'], 4: ['Высшей математики', 'ВМ'], 5: ['"Алгоритмическая математика"', 'АМ'], 6: ['Вычислительной техники', 'ВТ'], 7: ['Инженерной защиты окружающей среды', 'ИЗОС'], 8: ['Инновационного менеджмента', 'ИМ'], 9: ['Иностранных языков', 'ИНЯЗ'], 10: ['Информационно-измерительных систем и технологий', 'ИИСТ'], 11: ['Фотоники', 'Фот'], 12: ['Корабельных систем управления', 'КСУ'], 13: ['Лазерных измерительных и навигационных систем', 'ЛИНС'], 14: ['Математического обеспечения и применения ЭВМ', 'МОЭВМ'], 15: ['Менеджмента и систем качества', 'МСК'], 16: ['Микрорадиоэлектроники и технологии радиоаппаратуры', 'МИТ'], 17: ['Микро- и наноэлектроники', 'МНЭ'], 18: ['Прикладной механики и инженерной графики', 'ПМИГ'], 19: ['Прикладной экономики', 'ПЭ'], 20: ['Радиотехнических систем', 'РС'], 21: ['Микроволновой электроники', 'МВЭ'], 22: ['Радиоэлектронных средств', 'РЭС'], 23: ['Робототехники и автоматизации производственных систем', 'РАПС'], 24: ['Систем автоматизированного проектирования', 'САПР'], 25: ['Систем автоматического управления', 'САУ'], 26: ['"Связи с общественностью"', 'СО'], 27: ['Телевидения и видеотехники', 'ТВ'], 28: ['Теоретических основ радиотехники', 'ТОР'], 29: ['Теоретических основ электротехники', 'ТОЭ'], 30: ['Физики', 'Физики'], 31: ['Физической химии', 'ФХ'], 32: ['Физической электроники и технологии', 'ФЭТ'], 33: ['Физического воспитания и спорта', 'ФВиС'], 34: ['Электроакустики и ультразвуковой техники', 'ЭУТ'], 35: ['Электронного приборостроения', 'ЭП'], 36: ['Электронных приборов и устройств', 'ЭПУ'], 37: ['Электротехнологической и преобразовательной техники', 'ЭТПТ'], 39: ['Безопасности жизнедеятельности', 'БЖД'], 40: ['Истории культуры, государства и права', 'ИКГП'], 41: ['Русского языка', 'РЯ'], 42: ['Социологии и политологии', 'СП'], 43: ['Философии', 'ФЛ'], 44: ['Экономики технологического предпринимательства', 'ЭТП'], 45: ['Базовая кафедра автоматизации исследований', 'Баз.АИ'], 46: ['Базовая кафедра "Интеллектуальные информационные технологии"', 'Баз.ИИТ'], 47: ['Медицинских технологий (базовая)', 'Баз.МТ'], 48: ['Базовая кафедра оптоэлектроники', 'Баз.ОЭ'], 49: ['Базовая кафедра радиоастрономии', 'Баз.РА'], 50: ['Базовая кафедра радиоэлектронных информационных систем и комплексов', 'Баз.РИСК'], 51: ['Базовая кафедра специальных средств радиоэлектроники', 'Баз.ССР'], 52: ['Базовая кафедра конструирования и производства судового электрооборудования', 'БККИПСЭ'], 53: ['Базовая кафедра технологии производства радиодеталей', 'БКТПР'], 54: ['Базовая кафедра конструирования и технологии электронной аппаратуры', 'Баз.КТЭА'], 55: ['Физики и современной технологии твердотельной электроники', 'Баз.ФТТЭ'], 58: ['Информационная безопасность', 'ИБ'], 59: ['Базовая кафедра "Вычислительные технологии"', 'Баз.ВТ'], 60: ['Базовая кафедра "Наноматериалы и нанотехнологии в радиоэлектронике"', 'Баз.ННР'], 61: ['Базовая кафедра "Медицинские информационные и биотехнические системы"', 'Баз.МИБТС'], 62: ['Базовая кафедра "Видеоинформационные системы"', 'Баз.ВИНС'], 63: ['Базовая кафедра "Программное и аппаратное обеспечение гидроакустических информационных систем"', 'Баз.ПАО ГИС'], 64: ['Базовая кафедра "Робототехники и автоматики"', 'Баз.РиА'], 99: ['Иная кафедра', 'ИК']}
+    sms_names = [{'Первый семестр': 1},{'Второй семестр': 2},{'Третий семестр': 3},
+                 {'Четвертый семестр': 4},{'Пятый семестр': 5},{'Шестой семестр': 6},
+                 {'Седьмой семестр': 7},{'Восьмой семестр': 8},{'Девятый семестр': 9},
+                 {'Десятый семестр': 10},]
+    ans = [{'title': list(x.keys())[0], 'disciplines':[], 'exams': [], 'zaceths': [], 'div_zaceths': [], 'kursah': ''} for x in sms_names]
+    print(ans)
     semester = {i:[] for i in range(1, 10)}
     exams = {i:[] for i in range(1, 10)}
     offsets = {i:[] for i in range(1, 10)}
@@ -156,20 +181,26 @@ def get_edu_prog(plan_id: int, custom_conn):
         for inf_subj in a:
             summar = conn.query(Summary).filter(Summary.subject == subj.subject).all()
             summar = 'None' if not summar else summar[0].summary
-            semester[inf_subj.sem].append({"subject":subj.subject, "hours":inf_subj.hours,
-                                            "ze": inf_subj.ze, "summary":summar[:min(200, len(summar))]})
-            semester[inf_subj.sem].sort(key=lambda x: x["hours"], reverse=True)
+            ans[inf_subj.sem - 1]['disciplines'].append({
+                'title': subj.subject,
+                'desctiption': summar[:min(200, len(summar))],
+                'ze': inf_subj.ze,
+                'hours': inf_subj.hours
+            })
+            ans[inf_subj.sem - 1]['disciplines'].sort(key=lambda x: x["hours"], reverse=True)
             if inf_subj.exam:
-                exams[inf_subj.sem].append(subj.subject)
+                ans[inf_subj.sem - 1]['exams'].append(subj.subject)
             if inf_subj.offset:
-                offsets[inf_subj.sem].append(subj.subject)
+                ans[inf_subj.sem - 1]['zaceths'].append(subj.subject)
             if inf_subj.diff_offset:
-                diff_offsets[inf_subj.sem].append(subj.subject)
+                ans[inf_subj.sem - 1]['div_zaceths'].append(subj.subject)
             if inf_subj.course_work:
-                course_works[inf_subj.sem].append(subj.subject)
+                ans[inf_subj.sem - 1]['kursah'] = subj.subject
     
     special = conn.query(Special).filter(Special.plan_id == plan_id).one()
-
+    ans["departament"] = departments[special.department_id][1]
+    ans["faculty"] = facs[special.fakultet_id]
+    ans["study_form"] = study_form[special.study_form_id]
     d = {
         "semester": semester,
         "exams": exams,
@@ -180,7 +211,7 @@ def get_edu_prog(plan_id: int, custom_conn):
         "faculty": facs[special.fakultet_id],
         "study_form": study_form[special.study_form_id]
     }
-    return d
+    return ans
 
 if __name__ == '__main__':
     create = False
@@ -288,4 +319,6 @@ if __name__ == '__main__':
     #a = conn.query(AddEdu.org_name).all()
     #s = set(x for x in a)
     #print(s, len(s))
+    #get_awesome_proff_sphere(6738,conn)
+    get_edu_prog(6738, conn)
     conn.close()
